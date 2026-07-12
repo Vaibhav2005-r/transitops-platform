@@ -185,21 +185,39 @@ exports.getDashboardStats = async (req, res) => {
       if (day) day.Fuel += log.cost;
     });
 
-    // Define distinct safe inland bounding boxes across different Indian states
-    const stateBoxes = [
-      { minLat: 27.0, maxLat: 29.0, minLng: 76.5, maxLng: 79.0 }, // North (UP/Haryana)
-      { minLat: 23.5, maxLat: 26.5, minLng: 73.5, maxLng: 76.0 }, // West (Rajasthan/MP border)
-      { minLat: 20.0, maxLat: 23.0, minLng: 75.5, maxLng: 79.5 }, // Central (Maharashtra/MP)
-      { minLat: 21.0, maxLat: 24.0, minLng: 81.5, maxLng: 85.0 }, // East (Jharkhand/Chhattisgarh)
-      { minLat: 14.0, maxLat: 18.0, minLng: 77.5, maxLng: 80.0 }  // South (Telangana/Karnataka)
+    // Define central points for all requested states
+    const stateCenters = [
+      { lat: 22.2587, lng: 71.1924 }, // Gujarat (GJ)
+      { lat: 19.7515, lng: 75.7139 }, // Maharashtra (MH)
+      { lat: 27.0238, lng: 74.2179 }, // Rajasthan (RJ)
+      { lat: 26.8467, lng: 80.9462 }, // Uttar Pradesh (UP)
+      { lat: 22.9734, lng: 78.6569 }, // Madhya Pradesh (MP)
+      { lat: 31.1471, lng: 75.3412 }, // Punjab
+      { lat: 29.0588, lng: 76.0856 }, // Haryana (HR)
+      { lat: 28.7041, lng: 77.1025 }, // Delhi
+      { lat: 31.1048, lng: 77.1734 }, // Himachal Pradesh (HP)
+      { lat: 25.0961, lng: 85.3131 }, // Bihar
+      { lat: 22.9868, lng: 87.8550 }, // West Bengal (WB)
+      { lat: 15.3173, lng: 75.7139 }, // Karnataka
+      { lat: 11.1271, lng: 78.6569 }, // Tamil Nadu (TN)
+      { lat: 18.1124, lng: 79.0193 }, // Telangana (TG)
+      { lat: 15.9129, lng: 79.7400 }, // Andhra Pradesh (AP)
+      { lat: 23.6102, lng: 85.2799 }, // Jharkhand (ZH)
+      { lat: 26.2006, lng: 92.9376 }  // NE India (Assam)
     ];
 
     const vehiclesWithLocation = liveVehicles.map((v, index) => {
-      // Break vehicles into distinct packets across different states
-      const box = stateBoxes[index % stateBoxes.length];
+      // Pick a state deterministically based on ID to ensure consistent packets
+      const center = stateCenters[index % stateCenters.length];
       
-      const safeLat = box.minLat + (Math.random() * (box.maxLat - box.minLat));
-      const safeLng = box.minLng + (Math.random() * (box.maxLng - box.minLng));
+      // Use polar coordinates to create an organic circular/cloud scatter instead of a square bounding box
+      // Radius up to ~1.2 degrees (approx 130km) from the state center
+      // Using Math.sqrt(Math.random()) ensures uniform distribution inside the circle
+      const radius = Math.sqrt(Math.random()) * 1.2; 
+      const angle = Math.random() * 2 * Math.PI;
+      
+      const safeLat = center.lat + (radius * Math.cos(angle));
+      const safeLng = center.lng + (radius * Math.sin(angle));
       
       return {
         ...v,
