@@ -79,91 +79,97 @@ function Vehicles() {
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="min-h-full">
       <motion.div variants={itemVariants} className="flex justify-between items-end mb-6">
         <div>
-          <h1 className="text-[28px] font-bold text-slate-800 tracking-tight">Vehicle Directory</h1>
-          <p className="text-sm text-slate-600 mt-1 font-medium">Manage and monitor all vehicles in your fleet.</p>
+          <h1 className="text-[28px] font-bold text-slate-800 dark:text-white tracking-tight">Vehicle Directory</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">Manage and monitor all vehicles in your fleet.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
             <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg" />
-            <input 
-              type="text" 
-              placeholder="Search vehicles..." 
+            <input
+              type="text"
+              placeholder="Search vehicles..."
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
                 setSearchParams(e.target.value ? { q: e.target.value } : {}, { replace: true });
               }}
-              className="pl-9 pr-4 py-2 bg-white/50 border border-white/60 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 w-64 placeholder:text-slate-500 backdrop-blur-md shadow-sm transition-all"
+              className="pl-9 pr-4 py-2 bg-white/50 dark:bg-slate-700/50 border border-white/60 dark:border-slate-600/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 w-64 placeholder:text-slate-400 dark:placeholder:text-slate-500 backdrop-blur-md shadow-sm transition-all dark:text-slate-200"
             />
           </div>
           {userRole === "Fleet Manager" && (
-            <Link to="/add-vehicle" className="bg-indigo-600/90 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md shadow-indigo-200 backdrop-blur-md transition-colors flex items-center gap-2">
-              <MdAdd className="text-lg" />
-              Add Vehicle
-            </Link>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Link to="/add-vehicle" className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-lg shadow-indigo-500/25 transition-colors flex items-center gap-2">
+                <MdAdd className="text-lg" />
+                Add Vehicle
+              </Link>
+            </motion.div>
           )}
         </div>
       </motion.div>
 
       {loading ? (
-        <div className="p-8 text-center text-slate-500 font-medium">Loading vehicles...</div>
+        <div className="p-8 flex flex-col items-center justify-center gap-3">
+          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-8 h-8 border-4 border-indigo-200 dark:border-indigo-800 border-t-indigo-600 rounded-full" />
+          <p className="text-slate-400 dark:text-slate-500 text-sm font-medium">Loading vehicles...</p>
+        </div>
       ) : (
-        <motion.div variants={itemVariants} className="bg-white/60 backdrop-blur-xl border border-white/50 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden">
+        <motion.div variants={itemVariants} className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-2xl shadow-xl overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-white/30 border-b border-white/40">
-                <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Vehicle</th>
-                <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Reg. Number</th>
-                <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Capacity (kg)</th>
-                <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Acquisition Cost</th>
-                <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Docs</th>
-                {userRole === "Fleet Manager" && <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>}
+              <tr className="bg-white/30 dark:bg-slate-700/30 border-b border-white/40 dark:border-slate-700/40">
+                <th className="py-3 px-6 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Vehicle</th>
+                <th className="py-3 px-6 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Reg. Number</th>
+                <th className="py-3 px-6 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Capacity (kg)</th>
+                <th className="py-3 px-6 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Acquisition Cost</th>
+                <th className="py-3 px-6 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                <th className="py-3 px-6 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Docs</th>
+                {userRole === "Fleet Manager" && <th className="py-3 px-6 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Actions</th>}
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/40">
-              {filteredVehicles.map(vehicle => (
-                <motion.tr onClick={() => alert(`Vehicle Profile for ${vehicle.registrationNumber} is currently simulated for the demo. Future feature coming soon!`)} whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }} key={vehicle.id} className="transition-colors cursor-pointer">
+            <tbody className="divide-y divide-white/40 dark:divide-slate-700/40">
+              {filteredVehicles.map((vehicle) => (
+                <motion.tr
+                  key={vehicle.id}
+                  onClick={() => alert(`Vehicle Profile for ${vehicle.registrationNumber} is currently simulated for the demo. Future feature coming soon!`)}
+                  whileHover={{ backgroundColor: "rgba(255,255,255,0.1)" }}
+                  className="transition-colors cursor-pointer group"
+                >
                   <td className="py-3 px-6 flex items-center gap-3">
-                    <div className="bg-indigo-100 text-indigo-600 p-2 rounded-lg shadow-sm">
+                    <motion.div whileHover={{ rotate: 10 }} className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400 p-2 rounded-xl shadow-sm">
                       <MdDirectionsCar className="text-xl" />
-                    </div>
+                    </motion.div>
                     <div>
-                      <p className="font-bold text-slate-800 text-sm">{vehicle.make} {vehicle.model}</p>
-                      <p className="text-xs text-slate-500">ID: #{vehicle.id}</p>
+                      <p className="font-bold text-slate-800 dark:text-white text-sm">{vehicle.make} {vehicle.model}</p>
+                      <p className="text-xs text-slate-400 dark:text-slate-500">ID: #{vehicle.id}</p>
                     </div>
                   </td>
-                  <td className="py-3 px-6 font-semibold text-slate-700 text-sm">{vehicle.registrationNumber}</td>
-                  <td className="py-3 px-6 font-medium text-slate-600 text-sm">{vehicle.capacityWeight}</td>
-                  <td className="py-3 px-6 font-medium text-slate-600 text-sm">₹{vehicle.acquisitionCost.toLocaleString()}</td>
+                  <td className="py-3 px-6 font-semibold text-slate-700 dark:text-slate-300 text-sm">{vehicle.registrationNumber}</td>
+                  <td className="py-3 px-6 font-medium text-slate-600 dark:text-slate-400 text-sm">{Math.round(vehicle.capacityWeight)}</td>
+                  <td className="py-3 px-6 font-medium text-slate-600 dark:text-slate-400 text-sm">₹{Math.round(vehicle.acquisitionCost).toLocaleString()}</td>
                   <td className="py-3 px-6">
-                    <span className={`px-2.5 py-1 text-[11px] font-bold rounded border shadow-sm ${getStatusColor(vehicle.status)}`}>
+                    <span className={`px-2.5 py-1 text-[11px] font-bold rounded-full border shadow-sm ${getStatusColor(vehicle.status)}`}>
                       {vehicle.status}
                     </span>
                   </td>
                   <td className="py-3 px-6">
-                    <button 
-                      onClick={(e) => { 
-                        e.stopPropagation(); 
-                        setSelectedVehicleForDoc(vehicle.registrationNumber);
-                        fileInputRef.current.click();
-                      }}
-                      className="text-[11px] font-bold text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition-colors"
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setSelectedVehicleForDoc(vehicle.registrationNumber); fileInputRef.current.click(); }}
+                      className="text-[11px] font-bold text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 px-2 py-1 rounded-lg transition-colors"
                     >
                       Upload Docs
                     </button>
                   </td>
                   {userRole === "Fleet Manager" && (
                     <td className="py-3 px-6 text-right">
-                      <button className="text-indigo-600 hover:text-indigo-800 text-xs font-bold mr-3" onClick={(e) => { e.stopPropagation(); alert('Edit coming soon!'); }}>Edit</button>
-                      <button className="text-rose-600 hover:text-rose-800 text-xs font-bold" onClick={(e) => { e.stopPropagation(); alert('Delete coming soon!'); }}>Delete</button>
+                      <button className="text-indigo-500 hover:text-indigo-700 text-xs font-bold mr-3 transition-colors" onClick={(e) => { e.stopPropagation(); alert('Edit coming soon!'); }}>Edit</button>
+                      <button className="text-rose-500 hover:text-rose-700 text-xs font-bold transition-colors" onClick={(e) => { e.stopPropagation(); alert('Delete coming soon!'); }}>Delete</button>
                     </td>
                   )}
                 </motion.tr>
               ))}
               {filteredVehicles.length === 0 && (
                 <tr>
-                  <td colSpan={userRole === "Fleet Manager" ? "7" : "6"} className="py-8 text-center text-slate-500 font-medium">No vehicles found.</td>
+                  <td colSpan={userRole === "Fleet Manager" ? "7" : "6"} className="py-12 text-center text-slate-400 dark:text-slate-500 font-medium">No vehicles found.</td>
                 </tr>
               )}
             </tbody>

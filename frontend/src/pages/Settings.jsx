@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { MdSave, MdCheckCircle } from "react-icons/md";
+import { useTheme } from "../context/ThemeContext";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -15,6 +16,7 @@ const itemVariants = {
 function Settings() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const { isDark, toggleTheme } = useTheme();
   
   const [settings, setSettings] = useState({
     notifications: true,
@@ -26,15 +28,10 @@ function Settings() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
     if (name === "darkMode") {
-      if (checked) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
+      toggleTheme();
+      return;
     }
-
     setSettings({
       ...settings,
       [name]: type === "checkbox" ? checked : value
@@ -56,8 +53,8 @@ function Settings() {
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="min-h-full max-w-4xl mx-auto">
       <motion.div variants={itemVariants} className="mb-6">
-        <h1 className="text-[28px] font-bold text-slate-800 tracking-tight">Platform Settings</h1>
-        <p className="text-sm text-slate-600 mt-1 font-medium">Configure your TransitOps experience and preferences.</p>
+        <h1 className="text-[28px] font-bold text-slate-800 dark:text-white tracking-tight">Platform Settings</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">Configure your TransitOps experience and preferences.</p>
       </motion.div>
 
       {success && (
@@ -70,7 +67,7 @@ function Settings() {
         </motion.div>
       )}
 
-      <motion.div variants={itemVariants} className="bg-white/60 backdrop-blur-xl border border-white/50 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden">
+      <motion.div variants={itemVariants} className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-2xl shadow-xl overflow-hidden">
         <form onSubmit={handleSave} className="p-6 md:p-8 space-y-8">
           
           {/* General Preferences */}
@@ -113,11 +110,20 @@ function Settings() {
 
           {/* Appearance */}
           <section>
-            <h2 className="text-lg font-bold text-slate-800 mb-4 pb-2 border-b border-slate-200">Appearance</h2>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input type="checkbox" name="darkMode" checked={settings.darkMode} onChange={handleChange} className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500" />
-              <span className="text-sm font-medium text-slate-700">Dark Mode</span>
-            </label>
+            <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-4 pb-2 border-b border-slate-200 dark:border-slate-700">Appearance</h2>
+            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/40 rounded-xl">
+              <div>
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Dark Mode</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Switch to a dark theme for the entire interface</p>
+              </div>
+              <button
+                type="button"
+                onClick={toggleTheme}
+                className={`relative w-12 h-6 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${isDark ? 'bg-indigo-600' : 'bg-slate-300'}`}
+              >
+                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 ${isDark ? 'translate-x-6' : 'translate-x-0'}`} />
+              </button>
+            </div>
           </section>
 
           <div className="flex justify-end pt-4 border-t border-slate-200/50">

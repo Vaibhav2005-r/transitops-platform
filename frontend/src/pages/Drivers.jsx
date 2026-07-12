@@ -67,68 +67,77 @@ function Drivers() {
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="min-h-full">
       <motion.div variants={itemVariants} className="flex justify-between items-end mb-6">
         <div>
-          <h1 className="text-[28px] font-bold text-slate-800 tracking-tight">Owners Directory</h1>
-          <p className="text-sm text-slate-600 mt-1 font-medium">Manage driver assignments and view safety profiles.</p>
+          <h1 className="text-[28px] font-bold text-slate-800 dark:text-white tracking-tight">Owners Directory</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">Manage driver assignments and view safety profiles.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="relative">
             <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg" />
-            <input 
-              type="text" 
-              placeholder="Search drivers..." 
+            <input
+              type="text"
+              placeholder="Search drivers..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-9 pr-4 py-2 bg-white/50 border border-white/60 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 w-64 placeholder:text-slate-500 backdrop-blur-md shadow-sm transition-all"
+              className="pl-9 pr-4 py-2 bg-white/50 dark:bg-slate-700/50 border border-white/60 dark:border-slate-600/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 w-64 placeholder:text-slate-400 dark:placeholder:text-slate-500 backdrop-blur-md shadow-sm transition-all dark:text-slate-200"
             />
           </div>
-          <button 
-            onClick={handleSendReminder} 
+          <motion.button
+            onClick={handleSendReminder}
             disabled={sendingReminder}
-            className="bg-white/50 border border-slate-300 hover:bg-white text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold shadow-sm backdrop-blur-md transition-colors flex items-center gap-2 disabled:opacity-50"
+            whileHover={{ scale: sendingReminder ? 1 : 1.02 }}
+            whileTap={{ scale: sendingReminder ? 1 : 0.98 }}
+            className="bg-white/50 dark:bg-slate-700/50 border border-slate-300 dark:border-slate-600 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-xl text-sm font-semibold shadow-sm backdrop-blur-md transition-colors flex items-center gap-2 disabled:opacity-50"
           >
             {sendingReminder ? "Sending..." : "Send Reminders"}
-          </button>
-          <Link to="/add-driver" className="bg-indigo-600/90 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md shadow-indigo-200 backdrop-blur-md transition-colors flex items-center gap-2">
-            <MdAdd className="text-lg" />
-            Add Driver
-          </Link>
+          </motion.button>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Link to="/add-driver" className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-lg shadow-indigo-500/25 transition-colors flex items-center gap-2">
+              <MdAdd className="text-lg" />
+              Add Driver
+            </Link>
+          </motion.div>
         </div>
       </motion.div>
 
       {loading ? (
-        <div className="p-8 text-center text-slate-500 font-medium">Loading drivers...</div>
+        <div className="p-8 flex flex-col items-center justify-center gap-3">
+          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: "linear" }} className="w-8 h-8 border-4 border-indigo-200 dark:border-indigo-800 border-t-indigo-600 rounded-full" />
+          <p className="text-slate-400 dark:text-slate-500 text-sm font-medium">Loading drivers...</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredDrivers.map((driver) => (
-            <motion.div variants={itemVariants} whileHover={{ y: -5 }} key={driver.id} className="bg-white/60 backdrop-blur-xl border border-white/50 rounded-2xl shadow-xl shadow-slate-200/50 p-6 flex flex-col justify-between transition-all">
+            <motion.div variants={itemVariants} whileHover={{ y: -5, scale: 1.01 }} key={driver.id} className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-2xl shadow-xl p-6 flex flex-col justify-between transition-all">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <img 
-                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(driver.name)}&background=random`} 
-                    alt={driver.name} 
-                    className="w-12 h-12 rounded-full shadow-sm" 
-                  />
+                  <div className="relative">
+                    <img
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(driver.name)}&background=random`}
+                      alt={driver.name}
+                      className="w-12 h-12 rounded-full shadow-md ring-2 ring-white dark:ring-slate-700"
+                    />
+                  </div>
                   <div>
-                    <h3 className="font-bold text-slate-800 leading-tight text-lg">{driver.name}</h3>
-                    <p className="text-xs text-slate-500 font-semibold">{driver.licenseNumber}</p>
+                    <h3 className="font-bold text-slate-800 dark:text-white leading-tight text-lg">{driver.name}</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">{driver.licenseNumber}</p>
                   </div>
                 </div>
-                <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full border shadow-sm ${getStatusColor(driver.status)}`}>
+                <span className={`px-2.5 py-1 text-[10px] font-bold rounded-full border shadow-sm ${getStatusColor(driver.status)}`}>
                   {driver.status}
                 </span>
               </div>
-              
-              <div className="mt-4 pt-4 border-t border-white/40 flex justify-between items-center">
-                <div className="flex items-center gap-1 bg-amber-100/80 px-2 py-1 rounded text-amber-700 shadow-sm border border-amber-200">
+
+              <div className="mt-4 pt-4 border-t border-slate-200/50 dark:border-slate-700/50 flex justify-between items-center">
+                <div className="flex items-center gap-1.5 bg-amber-50 dark:bg-amber-900/30 px-2.5 py-1 rounded-lg text-amber-700 dark:text-amber-400 shadow-sm border border-amber-200 dark:border-amber-800/50">
                   <MdStar className="text-sm" />
-                  <span className="text-xs font-bold">{driver.safetyScore} Safety Score</span>
+                  <span className="text-xs font-bold">{Math.round(driver.safetyScore)} Safety Score</span>
                 </div>
-                <button onClick={() => navigate(`/driver/${driver.id}`)} className="text-[11px] font-bold text-indigo-600 hover:underline">View Profile</button>
+                <button onClick={() => navigate(`/driver/${driver.id}`)} className="text-[11px] font-bold text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:underline transition-colors">View Profile</button>
               </div>
             </motion.div>
           ))}
           {filteredDrivers.length === 0 && (
-             <div className="col-span-3 py-8 text-center text-slate-500 font-medium">No drivers found.</div>
+             <div className="col-span-3 py-12 text-center text-slate-400 dark:text-slate-500 font-medium">No drivers found.</div>
           )}
         </div>
       )}
