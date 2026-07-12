@@ -37,18 +37,61 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/reports/dashboard")
-      .then((res) => res.json())
-      .then((json) => {
+    // 1. Authenticate to get a token (needed after Hour 4 RBAC hardening)
+    const authenticateAndFetch = async () => {
+      try {
+        let token = localStorage.getItem("transitops_token");
+        
+        // If no token, register/login a test Fleet Manager automatically
+        if (!token) {
+          const authRes = await fetch("http://localhost:3000/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: "manager_test@transitops.com",
+              password: "securepassword",
+              name: "Test Manager",
+              role: "Fleet Manager"
+            })
+          });
+          
+          const loginRes = await fetch("http://localhost:3000/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: "manager_test@transitops.com",
+              password: "securepassword"
+            })
+          });
+          
+          const loginData = await loginRes.json();
+          if (loginData.token) {
+            token = loginData.token;
+            localStorage.setItem("transitops_token", token);
+          }
+        }
+
+        // 2. Fetch the dashboard data using the token
+        const res = await fetch("http://localhost:3000/api/reports/dashboard", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        
+        const json = await res.json();
         if (json.success) {
           setData(json.data);
+        } else {
+          console.error("Dashboard error:", json.error);
         }
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error("Failed to fetch dashboard data:", err);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    authenticateAndFetch();
   }, []);
 
   if (loading) {
