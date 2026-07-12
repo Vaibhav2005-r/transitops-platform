@@ -185,17 +185,31 @@ exports.getDashboardStats = async (req, res) => {
       if (day) day.Fuel += log.cost;
     });
 
-    // Assign pseudo-random coordinates around Mumbai based on vehicle ID
-    const baseLat = 19.0760;
-    const baseLng = 72.8777;
-    const vehiclesWithLocation = liveVehicles.map(v => {
-      // Deterministic pseudo-random offset
-      const offsetLat = ((v.id * 13) % 100) / 1000 - 0.05;
-      const offsetLng = ((v.id * 17) % 100) / 1000 - 0.05;
+    // Assign pseudo-random coordinates across Mumbai Metropolitan Region (MMR)
+    const mmrRegions = [
+      { lat: 18.9500, lng: 72.8200 }, // South Mumbai
+      { lat: 19.1000, lng: 72.8400 }, // Western Suburbs (Andheri)
+      { lat: 19.2300, lng: 72.8500 }, // Borivali
+      { lat: 19.0800, lng: 72.9000 }, // Eastern Suburbs (Ghatkopar)
+      { lat: 19.1800, lng: 72.9600 }, // Thane
+      { lat: 19.0700, lng: 72.9900 }, // Vashi (Navi Mumbai)
+      { lat: 18.9900, lng: 73.1100 }, // Panvel
+      { lat: 19.2300, lng: 73.1300 }, // Kalyan
+      { lat: 19.3200, lng: 72.8400 }  // Vasai
+    ];
+    
+    const vehiclesWithLocation = liveVehicles.map((v, index) => {
+      // Pick a region deterministically based on vehicle ID
+      const region = mmrRegions[v.id % mmrRegions.length];
+      
+      // Tiny deterministic offset to avoid overlap (roughly within 1-2 km of the region center)
+      const offsetLat = ((v.id * 13) % 20 - 10) / 1000;
+      const offsetLng = ((v.id * 17) % 20 - 10) / 1000;
+      
       return {
         ...v,
-        lat: baseLat + offsetLat,
-        lng: baseLng + offsetLng
+        lat: region.lat + offsetLat,
+        lng: region.lng + offsetLng
       };
     });
 
