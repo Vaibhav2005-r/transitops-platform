@@ -55,9 +55,9 @@ exports.copilotQuery = async (req, res) => {
       const systemMessage = `You are the TransitOps Copilot, an AI assistant for fleet managers. Answer the user's query based ONLY on the following live fleet data. If they ask something unrelated, politely steer them back to fleet management.
 LIVE FLEET CONTEXT (JSON): ${JSON.stringify(contextData)}`;
 
-      // Using Llama 3 8B Instruct model
+      // Using Qwen 2.5 72B Instruct (fully open, no license acceptance required, fully supports Chat API)
       const response = await hf.chatCompletion({
-        model: "meta-llama/Meta-Llama-3-8B-Instruct",
+        model: "Qwen/Qwen2.5-72B-Instruct",
         messages: [
           { role: "system", content: systemMessage },
           { role: "user", content: prompt }
@@ -70,7 +70,7 @@ LIVE FLEET CONTEXT (JSON): ${JSON.stringify(contextData)}`;
         success: true,
         data: {
           reply: response.choices[0].message.content,
-          mode: 'huggingface (llama-3)'
+          mode: 'huggingface (qwen-2.5)'
         }
       });
     } else {
