@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import HelpModal from "./ui/HelpModal";
-import NotificationsModal from "./ui/NotificationsModal";
+import HelpModal from "../ui/HelpModal";
+import NotificationsModal from "../ui/NotificationsModal";
 import { motion } from "framer-motion";
 import { MdLogout } from "react-icons/md";
 import {
