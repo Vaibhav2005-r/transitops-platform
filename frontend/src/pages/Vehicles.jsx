@@ -20,6 +20,7 @@ function Vehicles() {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const userRole = localStorage.getItem("transitops_role");
 
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -77,10 +78,12 @@ function Vehicles() {
               className="pl-9 pr-4 py-2 bg-white/50 border border-white/60 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 w-64 placeholder:text-slate-500 backdrop-blur-md shadow-sm transition-all"
             />
           </div>
-          <Link to="/add-vehicle" className="bg-indigo-600/90 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md shadow-indigo-200 backdrop-blur-md transition-colors flex items-center gap-2">
-            <MdAdd className="text-lg" />
-            Add Vehicle
-          </Link>
+          {userRole === "Fleet Manager" && (
+            <Link to="/add-vehicle" className="bg-indigo-600/90 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md shadow-indigo-200 backdrop-blur-md transition-colors flex items-center gap-2">
+              <MdAdd className="text-lg" />
+              Add Vehicle
+            </Link>
+          )}
         </div>
       </motion.div>
 
@@ -96,6 +99,7 @@ function Vehicles() {
                 <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Capacity (kg)</th>
                 <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Acquisition Cost</th>
                 <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                {userRole === "Fleet Manager" && <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-white/40">
@@ -118,11 +122,17 @@ function Vehicles() {
                       {vehicle.status}
                     </span>
                   </td>
+                  {userRole === "Fleet Manager" && (
+                    <td className="py-3 px-6 text-right">
+                      <button className="text-indigo-600 hover:text-indigo-800 text-xs font-bold mr-3" onClick={(e) => { e.stopPropagation(); alert('Edit coming soon!'); }}>Edit</button>
+                      <button className="text-rose-600 hover:text-rose-800 text-xs font-bold" onClick={(e) => { e.stopPropagation(); alert('Delete coming soon!'); }}>Delete</button>
+                    </td>
+                  )}
                 </motion.tr>
               ))}
               {filteredVehicles.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="py-8 text-center text-slate-500 font-medium">No vehicles found.</td>
+                  <td colSpan={userRole === "Fleet Manager" ? "6" : "5"} className="py-8 text-center text-slate-500 font-medium">No vehicles found.</td>
                 </tr>
               )}
             </tbody>
