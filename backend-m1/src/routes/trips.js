@@ -113,4 +113,105 @@ router.put('/:id/status', async (req, res) => {
   }
 });
 
+// 3. List Trips (GET /api/trips)
+router.get('/', async (req, res) => {
+  try {
+    const { status, vehicleId, driverId } = req.query;
+
+    const where = {};
+    if (status) where.status = status;
+    if (vehicleId) where.vehicleId = parseInt(vehicleId, 10);
+    if (driverId) where.driverId = parseInt(driverId, 10);
+
+    const trips = await prisma.trip.findMany({
+      where,
+      include: { vehicle: true, driver: true },
+      orderBy: { createdAt: 'desc' },
+      take: 100 // Add a limit since there are 10,000 dummy records!
+    });
+
+    res.json(trips);
+  } catch (error) {
+    console.error('Error listing trips:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// 4. Get Trip Details (GET /api/trips/:id)
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const trip = await prisma.trip.findUnique({
+      where: { id: parseInt(id, 10) },
+      include: { vehicle: true, driver: true }
+    });
+
+    if (!trip) {
+      return res.status(404).json({ error: 'Trip not found' });
+    }
+
+    res.json(trip);
+  } catch (error) {
+    console.error('Error fetching trip:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// 5. Update Trip (PUT /api/trips/:id)
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { source, destination, cargoWeight, distance, revenue } = req.body;
+
+    const existingTrip = await prisma.trip.findUnique({
+      where: { id: parseInt(id, 10) }
+    });
+
+    if (!existingTrip) {
+      return res.status(404).json({ error: 'Trip not found' });
+    }
+
+    const updateData = {};
+    if (source !== undefined) updateData.source = source;
+    if (destination !== undefined) updateData.destination = destination;
+    if (cargoWeight !== undefined) updateData.cargoWeight = parseFloat(cargoWeight);
+    if (distance !== undefined) updateData.distance = parseFloat(distance);
+    if (revenue !== undefined) updateData.revenue = parseFloat(revenue);
+
+    const trip = await prisma.trip.update({
+      where: { id: parseInt(id, 10) },
+      data: updateData
+    });
+
+    res.json(trip);
+  } catch (error) {
+    console.error('Error updating trip:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// 6. Delete Trip (DELETE /api/trips/:id)
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const existingTrip = await prisma.trip.findUnique({
+      where: { id: parseInt(id, 10) }
+    });
+
+    if (!existingTrip) {
+      return res.status(404).json({ error: 'Trip not found' });
+    }
+
+    await prisma.trip.delete({
+      where: { id: parseInt(id, 10) }
+    });
+
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting trip:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;
