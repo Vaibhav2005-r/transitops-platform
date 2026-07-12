@@ -185,32 +185,17 @@ exports.getDashboardStats = async (req, res) => {
       if (day) day.Fuel += log.cost;
     });
 
-    // Assign pseudo-random coordinates across major Indian cities
-    const indiaRegions = [
-      { lat: 19.0760, lng: 72.8777 }, // Mumbai
-      { lat: 28.7041, lng: 77.1025 }, // New Delhi
-      { lat: 12.9716, lng: 77.5946 }, // Bangalore
-      { lat: 13.0827, lng: 80.2707 }, // Chennai
-      { lat: 22.5726, lng: 88.3639 }, // Kolkata
-      { lat: 17.3850, lng: 78.4867 }, // Hyderabad
-      { lat: 23.0225, lng: 72.5714 }, // Ahmedabad
-      { lat: 18.5204, lng: 73.8567 }, // Pune
-      { lat: 26.9124, lng: 75.7873 }, // Jaipur
-      { lat: 21.1702, lng: 72.8311 }  // Surat
-    ];
-    
-    const vehiclesWithLocation = liveVehicles.map((v, index) => {
-      // Pick a region based on vehicle ID so it doesn't jump between regions on refresh, but is still spread out
-      const region = indiaRegions[v.id % indiaRegions.length];
-      
-      // Random offset within roughly ~5-10km (0.1 degrees) to spread them out naturally around the city
-      const offsetLat = (Math.random() - 0.5) * 0.2;
-      const offsetLng = (Math.random() - 0.5) * 0.2;
+    const vehiclesWithLocation = liveVehicles.map((v) => {
+      // Pick a safe, completely inland bounding box in Central India (MP, UP, Rajasthan, Maharashtra inland)
+      // Lat between 20.0 and 26.0, Lng between 75.0 and 82.0
+      // This guarantees they will never fall into the Arabian Sea or Bay of Bengal.
+      const safeLat = 20.0 + (Math.random() * 6.0);
+      const safeLng = 75.0 + (Math.random() * 7.0);
       
       return {
         ...v,
-        lat: region.lat + offsetLat,
-        lng: region.lng + offsetLng
+        lat: safeLat,
+        lng: safeLng
       };
     });
 
