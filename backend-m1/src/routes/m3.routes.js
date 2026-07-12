@@ -8,6 +8,11 @@ const expenseController = require('../controllers/expense.controller');
 // M3: Basic Create Endpoints (Hour 2)
 router.post('/maintenance', maintenanceController.createMaintenanceLog);
 router.post('/fuel', fuelController.createFuelLog);
-router.post('/expense', expenseController.createExpense);
+
+// M3: Expense CRUD Endpoints (Hour 2)
+router.get('/expenses', expenseController.getExpenses);
+router.post('/expenses', expenseController.createExpense);
+router.put('/expenses/:id', expenseController.updateExpense);
+router.delete('/expenses/:id', expenseController.deleteExpense);
 
 module.exports = router;
