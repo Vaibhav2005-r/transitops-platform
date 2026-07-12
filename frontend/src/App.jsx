@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Vehicles from "./pages/Vehicles";
 import AddVehicle from "./pages/AddVehicle";
 import Drivers from "./pages/Drivers";
+import AddDriver from "./pages/AddDriver";
 import Trips from "./pages/Trips";
 import Maintenance from "./pages/Maintenance";
 import Reports from "./pages/Reports";
@@ -22,6 +23,7 @@ function App() {
           <Route path="/vehicles" element={<Vehicles />} />
           <Route path="/add-vehicle" element={<AddVehicle />} />
           <Route path="/drivers" element={<Drivers />} />
+          <Route path="/add-driver" element={<AddDriver />} />
           <Route path="/trips" element={<Trips />} />
           <Route path="/maintenance" element={<Maintenance />} />
           <Route path="/reports" element={<Reports />} />

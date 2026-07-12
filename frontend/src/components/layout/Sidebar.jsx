@@ -95,21 +95,21 @@ function Sidebar() {
       {/* Bottom Menu */}
       <div className="px-3 pb-4">
         <nav className="space-y-1 mb-4">
-          <motion.a whileHover={{ scale: 1.02 }} href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-white/50 transition-colors">
+          <motion.button onClick={() => alert("Settings configuration coming soon in V2!")} whileHover={{ scale: 1.02 }} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-white/50 transition-colors">
             <FaCog className="text-indigo-500" />
             <span>Settings</span>
-          </motion.a>
-          <motion.a whileHover={{ scale: 1.02 }} href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-white/50 transition-colors">
+          </motion.button>
+          <motion.button onClick={() => alert("Help center is currently under maintenance.")} whileHover={{ scale: 1.02 }} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-white/50 transition-colors">
             <FaQuestionCircle className="text-indigo-500" />
             <span>Help and Support</span>
-          </motion.a>
-          <motion.a whileHover={{ scale: 1.02 }} href="#" className="flex items-center justify-between px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-white/50 transition-colors">
+          </motion.button>
+          <motion.button onClick={() => alert("You have 8 unread notifications!")} whileHover={{ scale: 1.02 }} className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-white/50 transition-colors">
             <div className="flex items-center gap-3">
               <FaBell className="text-indigo-500" />
               <span>Notifications</span>
             </div>
             <span className="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">8</span>
-          </motion.a>
+          </motion.button>
         </nav>
         
         {/* User Profile */}

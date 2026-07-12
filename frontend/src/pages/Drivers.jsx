@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { MdPerson, MdSearch, MdAdd, MdStar } from "react-icons/md";
 
@@ -16,6 +17,7 @@ function Drivers() {
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDrivers = async () => {
@@ -69,7 +71,7 @@ function Drivers() {
               className="pl-9 pr-4 py-2 bg-white/50 border border-white/60 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 w-64 placeholder:text-slate-500 backdrop-blur-md shadow-sm transition-all"
             />
           </div>
-          <button className="bg-indigo-600/90 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md shadow-indigo-200 backdrop-blur-md transition-colors flex items-center gap-2">
+          <button onClick={() => navigate('/add-driver')} className="bg-indigo-600/90 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md shadow-indigo-200 backdrop-blur-md transition-colors flex items-center gap-2">
             <MdAdd className="text-lg" />
             Add Owner
           </button>
