@@ -33,7 +33,7 @@ function Expenses() {
     try {
       let token = localStorage.getItem("transitops_token");
       if (!token) return;
-      const res = await fetch("http://localhost:3000/api/m3/expenses", {
+      const res = await fetch("http://localhost:3000/api/expenses", {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const data = await res.json();
@@ -73,7 +73,7 @@ function Expenses() {
     try {
       const token = localStorage.getItem("transitops_token");
       
-      let url = "http://localhost:3000/api/m3/expenses";
+      let url = "http://localhost:3000/api/expenses";
       let bodyData = {
         vehicleId: parseInt(formData.vehicleId),
         description: formData.description || "Fuel",
@@ -83,7 +83,7 @@ function Expenses() {
       };
 
       if (formData.type === "Fuel") {
-        url = "http://localhost:3000/api/m3/fuel";
+        url = "http://localhost:3000/api/fuel";
         bodyData = {
           vehicleId: parseInt(formData.vehicleId),
           liters: parseFloat(formData.liters),

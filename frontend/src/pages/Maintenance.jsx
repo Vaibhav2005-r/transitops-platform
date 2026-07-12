@@ -33,7 +33,7 @@ function Maintenance() {
       let token = localStorage.getItem("transitops_token");
       if (!token) return;
 
-      const res = await fetch("http://localhost:3000/api/m3/maintenance", {
+      const res = await fetch("http://localhost:3000/api/maintenance", {
         headers: { "Authorization": `Bearer ${token}` }
       });
       const data = await res.json();
@@ -72,7 +72,7 @@ function Maintenance() {
 
     try {
       const token = localStorage.getItem("transitops_token");
-      const res = await fetch("http://localhost:3000/api/m3/maintenance", {
+      const res = await fetch("http://localhost:3000/api/maintenance", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
