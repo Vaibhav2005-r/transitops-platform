@@ -22,7 +22,10 @@ app.get('/health', (req, res) => {
 
 // Mount Routes
 const m3Routes = require('./routes/m3.routes');
+const driversRouter = require('./routes/drivers');
+
 app.use('/api', m3Routes);
+app.use('/api/drivers', driversRouter);
 
 // Start server
 app.listen(PORT, () => {
