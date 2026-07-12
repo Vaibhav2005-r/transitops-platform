@@ -1,7 +1,10 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MdLogout, MdDashboard, MdDirectionsCar, MdPeople, MdBuild, MdAddBox, MdAttachMoney, MdMap } from "react-icons/md";
 import { FaChartBar, FaCog, FaQuestionCircle, FaBell, FaTruck } from "react-icons/fa";
+import HelpModal from "../ui/HelpModal";
+import NotificationsModal from "../ui/NotificationsModal";
 
 const menuItems = [
   { name: "My Dashboard", icon: <MdDashboard />, path: "/" },
@@ -33,6 +36,15 @@ function Sidebar() {
   const userName = localStorage.getItem("transitops_user") || "User";
   const userRole = localStorage.getItem("transitops_role") || "Staff";
   const userInitials = userName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: 1, type: "warning", title: "Maintenance Due", message: "Vehicle #MH-01-AB-1234 is due for oil change.", time: "10 mins ago" },
+    { id: 2, type: "info", title: "Trip Completed", message: "Trip #TRP-892 completed successfully.", time: "1 hour ago" },
+    { id: 3, type: "success", title: "Payment Received", message: "Payment of ₹15,000 received for Invoice #INV-102.", time: "2 hours ago" },
+    { id: 4, type: "warning", title: "Low Fuel Alert", message: "Vehicle #MH-04-XY-9876 reported low fuel.", time: "3 hours ago" }
+  ]);
 
   const handleLogout = () => {
     localStorage.removeItem("transitops_token");
@@ -141,7 +153,7 @@ function Sidebar() {
             <span>Settings</span>
           </NavLink>
           <motion.button
-            onClick={() => alert("Help center is currently under maintenance.")}
+            onClick={() => setIsHelpOpen(true)}
             whileHover={{ x: 2 }}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-white/60 dark:hover:bg-slate-700/60 transition-colors"
           >
@@ -149,7 +161,7 @@ function Sidebar() {
             <span>Help and Support</span>
           </motion.button>
           <motion.button
-            onClick={() => alert("You have 8 unread notifications!")}
+            onClick={() => setIsNotifOpen(true)}
             whileHover={{ x: 2 }}
             className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-white/60 dark:hover:bg-slate-700/60 transition-colors"
           >
@@ -157,13 +169,15 @@ function Sidebar() {
               <FaBell className="text-base" />
               <span>Notifications</span>
             </div>
-            <motion.span
-              animate={{ scale: [1, 1.15, 1] }}
-              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-              className="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm shadow-rose-500/30"
-            >
-              8
-            </motion.span>
+            {notifications.length > 0 && (
+              <motion.span
+                animate={{ scale: [1, 1.15, 1] }}
+                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                className="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm shadow-rose-500/30"
+              >
+                {notifications.length}
+              </motion.span>
+            )}
           </motion.button>
         </nav>
 
@@ -193,6 +207,14 @@ function Sidebar() {
           </motion.button>
         </div>
       </div>
+      
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+      <NotificationsModal 
+        isOpen={isNotifOpen} 
+        onClose={() => setIsNotifOpen(false)} 
+        notifications={notifications} 
+        onClear={() => setNotifications([])} 
+      />
     </aside>
   );
 }
