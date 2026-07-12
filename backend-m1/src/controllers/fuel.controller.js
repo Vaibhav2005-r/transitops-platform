@@ -1,13 +1,16 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+const { createFuelSchema } = require('../validators/m3.validators');
+
 exports.createFuelLog = async (req, res) => {
   try {
-    const { vehicleId, liters, cost, date } = req.body;
-
-    if (!vehicleId || liters === undefined || cost === undefined) {
-      return res.status(400).json({ success: false, error: 'vehicleId, liters, and cost are required' });
+    const parseResult = createFuelSchema.safeParse(req.body);
+    if (!parseResult.success) {
+      return res.status(400).json({ success: false, error: parseResult.error.issues.map(e => e.message).join(', ') });
     }
+
+    const { vehicleId, liters, cost, date } = parseResult.data;
 
     const vehicle = await prisma.vehicle.findUnique({ where: { id: parseInt(vehicleId) } });
     if (!vehicle) {

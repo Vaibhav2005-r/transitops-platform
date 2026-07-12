@@ -1,6 +1,8 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+const { createExpenseSchema, updateExpenseSchema } = require('../validators/m3.validators');
+
 // 7.2 List Expenses
 exports.getExpenses = async (req, res) => {
   try {
@@ -15,11 +17,12 @@ exports.getExpenses = async (req, res) => {
 // 7.3 Record Other Expense
 exports.createExpense = async (req, res) => {
   try {
-    const { vehicleId, description, cost, type, date } = req.body;
-
-    if (!vehicleId || !description || cost === undefined || !type) {
-      return res.status(400).json({ success: false, error: 'vehicleId, description, cost, and type are required' });
+    const parseResult = createExpenseSchema.safeParse(req.body);
+    if (!parseResult.success) {
+      return res.status(400).json({ success: false, error: parseResult.error.issues.map(e => e.message).join(', ') });
     }
+
+    const { vehicleId, description, cost, type, date } = parseResult.data;
 
     const vehicle = await prisma.vehicle.findUnique({ where: { id: parseInt(vehicleId) } });
     if (!vehicle) {
@@ -47,7 +50,13 @@ exports.createExpense = async (req, res) => {
 exports.updateExpense = async (req, res) => {
   try {
     const { id } = req.params;
-    const { description, cost, type } = req.body;
+    
+    const parseResult = updateExpenseSchema.safeParse(req.body);
+    if (!parseResult.success) {
+      return res.status(400).json({ success: false, error: parseResult.error.issues.map(e => e.message).join(', ') });
+    }
+
+    const { description, cost, type } = parseResult.data;
 
     const existingExpense = await prisma.expense.findUnique({ where: { id: parseInt(id) } });
     if (!existingExpense) {

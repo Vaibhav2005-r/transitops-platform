@@ -15,4 +15,7 @@ router.post('/expenses', expenseController.createExpense);
 router.put('/expenses/:id', expenseController.updateExpense);
 router.delete('/expenses/:id', expenseController.deleteExpense);
 
+// M3: Business Logic Endpoints (Hour 3)
+router.put('/maintenance/:id/close', maintenanceController.closeMaintenanceLog);
+
 module.exports = router;
