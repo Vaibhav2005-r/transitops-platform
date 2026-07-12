@@ -6,7 +6,12 @@ const { createExpenseSchema, updateExpenseSchema } = require('../validators/m3.v
 // 7.2 List Expenses
 exports.getExpenses = async (req, res) => {
   try {
-    const expenses = await prisma.expense.findMany();
+    const expenses = await prisma.expense.findMany({
+      orderBy: [
+        { date: 'desc' },
+        { cost: 'desc' }
+      ]
+    });
     res.status(200).json(expenses);
   } catch (error) {
     console.error('Error fetching expenses:', error);

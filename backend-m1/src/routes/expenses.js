@@ -7,8 +7,29 @@ const router = express.Router();
 // List Expenses
 router.get('/', authenticate, authorize('Fleet Manager', 'Financial Analyst'), async (req, res) => {
   try {
-    const expenses = await prisma.expense.findMany();
-    res.json(expenses);
+    const rawExpenses = await prisma.expense.findMany();
+    const rawFuelLogs = await prisma.fuelLog.findMany();
+
+    const formattedFuelLogs = rawFuelLogs.map(log => ({
+      id: `f-${log.id}`,
+      vehicleId: log.vehicleId,
+      description: `${log.liters} Liters`,
+      cost: log.cost,
+      type: 'Fuel',
+      date: log.date
+    }));
+
+    const combined = [...rawExpenses, ...formattedFuelLogs];
+
+    combined.sort((a, b) => {
+      // Sort by date (descending)
+      const dateDiff = new Date(b.date) - new Date(a.date);
+      if (dateDiff !== 0) return dateDiff;
+      // Sort by amount/cost (descending)
+      return b.cost - a.cost;
+    });
+
+    res.json(combined);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
