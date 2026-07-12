@@ -4,7 +4,7 @@ import Navbar from "./Navbar";
 
 function MainLayout() {
   return (
-    <div className="flex h-screen bg-slate-50 font-sans overflow-hidden">
+    <div className="flex h-screen bg-gradient-to-br from-indigo-100 via-sky-50 to-teal-100 font-sans overflow-hidden">
       <Sidebar />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">

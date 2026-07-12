@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
   MdDirectionsCar,
   MdCheckCircle,
@@ -17,6 +18,19 @@ import {
   Pie,
   Cell,
 } from "recharts";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+};
 
 function Dashboard() {
   const [data, setData] = useState(null);
@@ -74,48 +88,58 @@ function Dashboard() {
   ];
 
   return (
-    <div className="bg-white min-h-full">
+    <motion.div 
+      variants={containerVariants} 
+      initial="hidden" 
+      animate="show" 
+      className="min-h-full"
+    >
       {/* HEADER */}
-      <div className="flex justify-between items-start mb-6">
+      <motion.div variants={itemVariants} className="flex justify-between items-start mb-6">
         <div>
           <h1 className="text-[28px] font-bold text-slate-800 tracking-tight">Good Morning, Ravi!</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-600 mt-1 font-medium">
             Here's the health overview of your fleet at a glance.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <select className="border border-slate-200 rounded-md py-1 px-3 text-xs font-semibold text-slate-600 bg-white">
+          <select className="border border-white/50 rounded-md py-1 px-3 text-xs font-semibold text-slate-600 bg-white/40 backdrop-blur-sm shadow-sm hover:bg-white/60 transition-colors outline-none focus:ring-2 focus:ring-indigo-500/50">
             <option>Last 7 Days</option>
             <option>Last 30 Days</option>
             <option>This Month</option>
           </select>
         </div>
-      </div>
+      </motion.div>
 
       {/* KPI ROW */}
       <div className="grid grid-cols-5 gap-4 mb-6">
         {kpis.map((kpi, index) => (
-          <div key={index} className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex flex-col justify-between">
+          <motion.div 
+            variants={itemVariants}
+            whileHover={{ scale: 1.03, y: -4 }}
+            key={index} 
+            className="bg-white/60 backdrop-blur-xl border border-white/50 rounded-2xl p-4 shadow-xl shadow-slate-200/50 flex flex-col justify-between"
+          >
             <div className="flex justify-between items-start">
-              <p className="text-xs font-semibold text-slate-500 w-20 leading-tight">
+              <p className="text-xs font-semibold text-slate-600 w-20 leading-tight">
                 {kpi.title}
               </p>
-              <div className="p-1">
+              <div className="p-1 bg-white/50 rounded-full shadow-sm backdrop-blur-sm">
                 {kpi.icon}
               </div>
             </div>
-            <h2 className="text-3xl font-bold text-slate-800 mt-3">{kpi.value}</h2>
-          </div>
+            <h2 className="text-3xl font-extrabold text-slate-800 mt-3 drop-shadow-sm">{kpi.value}</h2>
+          </motion.div>
         ))}
       </div>
 
       {/* CHARTS ROW */}
       <div className="grid grid-cols-3 gap-6 mb-6">
         {/* DONUT CHART */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <motion.div variants={itemVariants} className="bg-white/60 backdrop-blur-xl border border-white/50 rounded-2xl p-5 shadow-xl shadow-slate-200/50">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="font-bold text-slate-800 text-sm">Fleet Status by Category</h3>
-            <span className="text-[10px] font-semibold text-blue-500 cursor-pointer">View More</span>
+            <h3 className="font-bold text-slate-800 text-sm drop-shadow-sm">Fleet Status by Category</h3>
+            <span className="text-[10px] font-semibold text-indigo-600 cursor-pointer hover:underline">View More</span>
           </div>
           <div className="h-48 relative">
             <ResponsiveContainer width="100%" height="100%">
@@ -134,7 +158,7 @@ function Dashboard() {
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(8px)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.5)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-2">
@@ -148,78 +172,78 @@ function Dashboard() {
           </div>
           <div className="flex justify-center gap-4 text-[10px] font-bold mt-2">
             {data.fleetStatusByCategory.map((cat, i) => (
-              <div key={i} className="flex items-center gap-1.5 text-slate-500">
+              <div key={i} className="flex items-center gap-1.5 text-slate-600">
                 <span className="w-3 h-1 rounded" style={{ backgroundColor: cat.fill }}></span>
                 <span>{cat.name} ({Math.round((cat.value / (data.fleetStatusByCategory.reduce((a,b)=>a+b.value,0)||1)) * 100)}%)</span>
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* STACKED BAR CHART */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <motion.div variants={itemVariants} className="bg-white/60 backdrop-blur-xl border border-white/50 rounded-2xl p-5 shadow-xl shadow-slate-200/50">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="font-bold text-slate-800 text-sm">Fuel vs Maintenance</h3>
-            <span className="text-[10px] font-semibold text-blue-500 cursor-pointer">View More</span>
+            <h3 className="font-bold text-slate-800 text-sm drop-shadow-sm">Fuel vs Maintenance</h3>
+            <span className="text-[10px] font-semibold text-indigo-600 cursor-pointer hover:underline">View More</span>
           </div>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data.fuelVsMaintenance} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} tickFormatter={(val) => `$${val/1000}k`} />
-                <Tooltip cursor={{ fill: 'transparent' }} />
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#475569', fontWeight: 600 }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#475569', fontWeight: 600 }} tickFormatter={(val) => `$${val/1000}k`} />
+                <Tooltip cursor={{ fill: 'rgba(255,255,255,0.4)' }} contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(8px)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.5)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
                 <Bar dataKey="Maintenance" stackId="a" fill="#14b8a6" barSize={24} />
-                <Bar dataKey="Fuel" stackId="a" fill="#fb7185" barSize={24} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Fuel" stackId="a" fill="#818cf8" barSize={24} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="flex justify-center gap-6 text-[10px] font-bold mt-3 text-slate-500">
+          <div className="flex justify-center gap-6 text-[10px] font-bold mt-3 text-slate-600">
             <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-teal-500"></div>
+              <div className="w-2 h-2 rounded-full bg-teal-500 shadow-sm"></div>
               <span>Maintenance</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-rose-400"></div>
+              <div className="w-2 h-2 rounded-full bg-indigo-400 shadow-sm"></div>
               <span>Fuel Costs</span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* TOP DRIVERS */}
-        <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <motion.div variants={itemVariants} className="bg-white/60 backdrop-blur-xl border border-white/50 rounded-2xl p-5 shadow-xl shadow-slate-200/50">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="font-bold text-slate-800 text-sm">Top Drivers</h3>
-            <span className="text-[10px] font-semibold text-blue-500 cursor-pointer">View More</span>
+            <h3 className="font-bold text-slate-800 text-sm drop-shadow-sm">Top Drivers</h3>
+            <span className="text-[10px] font-semibold text-indigo-600 cursor-pointer hover:underline">View More</span>
           </div>
           <div className="space-y-3.5">
             {data.topDrivers.map((driver, index) => (
-              <div key={driver.id} className="flex items-center justify-between">
+              <motion.div whileHover={{ x: 4 }} key={driver.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/40 transition-colors cursor-pointer">
                 <div className="flex items-center gap-3">
                   <img 
                     src={`https://ui-avatars.com/api/?name=${encodeURIComponent(driver.name)}&background=random`} 
                     alt={driver.name} 
-                    className="w-8 h-8 rounded-full" 
+                    className="w-8 h-8 rounded-full shadow-sm" 
                   />
                   <div>
                     <p className="text-[13px] font-bold text-slate-800 leading-tight">{driver.name}</p>
-                    <a href="#" className="text-[10px] font-semibold text-blue-500 hover:underline">Visit Profile</a>
+                    <a href="#" className="text-[10px] font-semibold text-indigo-500 hover:underline">Visit Profile</a>
                   </div>
                 </div>
-                <span className="font-bold text-slate-800 text-sm">{driver.safetyScore}</span>
-              </div>
+                <span className="font-extrabold text-slate-800 text-sm bg-white/60 px-2 py-1 rounded shadow-sm">{driver.safetyScore}</span>
+              </motion.div>
             ))}
             {data.topDrivers.length === 0 && (
               <p className="text-sm text-slate-500">No driver data available.</p>
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* MAP */}
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-        <div className="flex justify-between items-center p-4 border-b border-slate-100">
-          <h3 className="font-bold text-slate-800 text-sm">Live Map</h3>
-          <span className="text-[10px] font-semibold text-blue-500 cursor-pointer">Detail View</span>
+      <motion.div variants={itemVariants} className="bg-white/60 backdrop-blur-xl border border-white/50 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden flex flex-col">
+        <div className="flex justify-between items-center p-4 border-b border-white/40 bg-white/30 backdrop-blur-md">
+          <h3 className="font-bold text-slate-800 text-sm drop-shadow-sm">Live Map</h3>
+          <span className="text-[10px] font-semibold text-indigo-600 cursor-pointer hover:underline">Detail View</span>
         </div>
         <div className="h-56 bg-slate-100 relative">
            <img 
@@ -228,18 +252,18 @@ function Dashboard() {
             className="w-full h-full object-cover opacity-80"
           />
           {/* Mock Yellow Taxi Icons */}
-          <div className="absolute top-[20%] left-[30%] bg-yellow-400 p-1.5 rounded-sm shadow-md rotate-12">
+          <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 2 }} className="absolute top-[20%] left-[30%] bg-yellow-400 p-1.5 rounded-sm shadow-md rotate-12">
             <MdDirectionsCar className="text-slate-800 text-xs" />
-          </div>
-          <div className="absolute top-[60%] left-[65%] bg-yellow-400 p-1.5 rounded-sm shadow-md -rotate-12">
+          </motion.div>
+          <motion.div animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 2.5, delay: 0.5 }} className="absolute top-[60%] left-[65%] bg-yellow-400 p-1.5 rounded-sm shadow-md -rotate-12">
             <MdDirectionsCar className="text-slate-800 text-xs" />
-          </div>
-          <div className="absolute bottom-[20%] right-[30%] bg-yellow-400 p-1.5 rounded-sm shadow-md rotate-45">
+          </motion.div>
+          <motion.div animate={{ y: [0, -6, 0] }} transition={{ repeat: Infinity, duration: 1.8, delay: 1 }} className="absolute bottom-[20%] right-[30%] bg-yellow-400 p-1.5 rounded-sm shadow-md rotate-45">
             <MdDirectionsCar className="text-slate-800 text-xs" />
-          </div>
+          </motion.div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

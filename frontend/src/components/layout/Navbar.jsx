@@ -2,7 +2,7 @@ import { MdChevronLeft, MdDirectionsCar, MdSearch, MdMic } from "react-icons/md"
 
 function Navbar() {
   return (
-    <header className="h-[72px] bg-white border-b border-slate-200 flex justify-between items-center px-4 shrink-0">
+    <header className="h-[72px] bg-white/40 backdrop-blur-xl border-b border-white/40 flex justify-between items-center px-4 shrink-0 shadow-sm z-10 relative">
       <div className="flex items-center gap-4">
         <button className="bg-teal-500 text-white rounded p-1 hover:bg-teal-600">
           <MdChevronLeft className="text-xl" />
@@ -23,10 +23,10 @@ function Navbar() {
           <input 
             type="text" 
             placeholder="Search vehicles or drivers..." 
-            className="pl-9 pr-4 py-1.5 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 w-64 placeholder:text-slate-400"
+            className="pl-9 pr-4 py-1.5 bg-white/50 border border-white/60 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500/50 w-64 placeholder:text-slate-500 backdrop-blur-md shadow-sm transition-all"
           />
         </div>
-        <button className="bg-teal-500 text-white rounded-md p-1.5 hover:bg-teal-600">
+        <button className="bg-teal-500/90 text-white rounded-md p-1.5 hover:bg-teal-500 transition-colors shadow-sm backdrop-blur-md">
           <MdMic className="text-lg" />
         </button>
       </div>
