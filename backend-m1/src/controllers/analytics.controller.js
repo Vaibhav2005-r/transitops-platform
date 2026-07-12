@@ -146,3 +146,49 @@ exports.getDashboardStats = async (req, res) => {
     res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 };
+
+// 8.1 Dashboard KPIs
+exports.getDashboardKPIs = async (req, res) => {
+  try {
+    const [
+      activeVehicles,
+      availableVehicles,
+      vehiclesInMaintenance,
+      totalActiveFleet,
+      activeTrips,
+      pendingTrips,
+      driversOnDuty
+    ] = await Promise.all([
+      prisma.vehicle.count({ where: { status: 'On Trip' } }),
+      prisma.vehicle.count({ where: { status: 'Available' } }),
+      prisma.vehicle.count({ where: { status: 'In Shop' } }),
+      prisma.vehicle.count({ where: { status: { not: 'Retired' } } }),
+      
+      prisma.trip.count({ where: { status: 'Dispatched' } }),
+      prisma.trip.count({ where: { status: 'Draft' } }),
+      
+      prisma.driver.count({ where: { status: { in: ['Available', 'On Trip'] } } })
+    ]);
+
+    // Formula: (Available + On Trip) / Total Active Fleet * 100
+    // Note: totalActiveFleet excludes Retired vehicles
+    let fleetUtilization = 0;
+    if (totalActiveFleet > 0) {
+      fleetUtilization = Number((((availableVehicles + activeVehicles) / totalActiveFleet) * 100).toFixed(1));
+    }
+
+    res.status(200).json({
+      activeVehicles,
+      availableVehicles,
+      vehiclesInMaintenance,
+      activeTrips,
+      pendingTrips,
+      driversOnDuty,
+      fleetUtilization
+    });
+
+  } catch (error) {
+    console.error('Error generating dashboard KPIs:', error);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
+};
