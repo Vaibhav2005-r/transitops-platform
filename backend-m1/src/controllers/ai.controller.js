@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const { GoogleGenAI } = require('@google/genai');
+const { HfInference } = require('@huggingface/inference');
 
 const prisma = new PrismaClient();
 
@@ -48,31 +48,29 @@ exports.copilotQuery = async (req, res) => {
     };
 
     // 2. Decide between Real AI and Mock Fallback
-    if (process.env.GEMINI_API_KEY) {
+    if (process.env.HF_TOKEN) {
       // -- REAL AI MODE --
-      const ai = new GoogleGenAI({});
+      const hf = new HfInference(process.env.HF_TOKEN);
       
-      const systemPrompt = `You are the TransitOps Copilot, an AI assistant for fleet managers.
-Answer the user's query based ONLY on the following live fleet data.
-If they ask something unrelated, politely steer them back to fleet management.
+      const systemMessage = `You are the TransitOps Copilot, an AI assistant for fleet managers. Answer the user's query based ONLY on the following live fleet data. If they ask something unrelated, politely steer them back to fleet management.
+LIVE FLEET CONTEXT (JSON): ${JSON.stringify(contextData)}`;
 
-LIVE FLEET CONTEXT (JSON):
-${JSON.stringify(contextData, null, 2)}`;
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
-          systemInstruction: systemPrompt,
-          temperature: 0.2
-        }
+      // Using Llama 3 8B Instruct model
+      const response = await hf.chatCompletion({
+        model: "meta-llama/Meta-Llama-3-8B-Instruct",
+        messages: [
+          { role: "system", content: systemMessage },
+          { role: "user", content: prompt }
+        ],
+        max_tokens: 500,
+        temperature: 0.1
       });
 
       return res.status(200).json({
         success: true,
         data: {
-          reply: response.text,
-          mode: 'gemini'
+          reply: response.choices[0].message.content,
+          mode: 'huggingface (llama-3)'
         }
       });
     } else {
@@ -92,7 +90,7 @@ ${JSON.stringify(contextData, null, 2)}`;
         reply += `Based on live data: Fleet Utilization is ${contextData.fleetUtilization}%, with ${contextData.activeTrips} active trips and ${contextData.vehiclesInMaintenance} vehicles in maintenance.`;
       }
 
-      reply += "\n\n*(Note: This is a simulated AI response using real database metrics. Add a GEMINI_API_KEY to the .env file to enable the true LLM experience.)*";
+      reply += "\n\n*(Note: This is a simulated AI response using real database metrics. Add a HF_TOKEN to the .env file to enable the true LLM experience.)*";
 
       return res.status(200).json({
         success: true,
