@@ -185,12 +185,21 @@ exports.getDashboardStats = async (req, res) => {
       if (day) day.Fuel += log.cost;
     });
 
-    const vehiclesWithLocation = liveVehicles.map((v) => {
-      // Pick a safe, completely inland bounding box in Central India (MP, UP, Rajasthan, Maharashtra inland)
-      // Lat between 20.0 and 26.0, Lng between 75.0 and 82.0
-      // This guarantees they will never fall into the Arabian Sea or Bay of Bengal.
-      const safeLat = 20.0 + (Math.random() * 6.0);
-      const safeLng = 75.0 + (Math.random() * 7.0);
+    // Define distinct safe inland bounding boxes across different Indian states
+    const stateBoxes = [
+      { minLat: 27.0, maxLat: 29.0, minLng: 76.5, maxLng: 79.0 }, // North (UP/Haryana)
+      { minLat: 23.5, maxLat: 26.5, minLng: 73.5, maxLng: 76.0 }, // West (Rajasthan/MP border)
+      { minLat: 20.0, maxLat: 23.0, minLng: 75.5, maxLng: 79.5 }, // Central (Maharashtra/MP)
+      { minLat: 21.0, maxLat: 24.0, minLng: 81.5, maxLng: 85.0 }, // East (Jharkhand/Chhattisgarh)
+      { minLat: 14.0, maxLat: 18.0, minLng: 77.5, maxLng: 80.0 }  // South (Telangana/Karnataka)
+    ];
+
+    const vehiclesWithLocation = liveVehicles.map((v, index) => {
+      // Break vehicles into distinct packets across different states
+      const box = stateBoxes[index % stateBoxes.length];
+      
+      const safeLat = box.minLat + (Math.random() * (box.maxLat - box.minLat));
+      const safeLng = box.minLng + (Math.random() * (box.maxLng - box.minLng));
       
       return {
         ...v,
