@@ -507,8 +507,8 @@ For authenticated endpoints, pass the JWT token in the `Authorization` header:
 
 ## 8. Dashboard & Reports API (`/api/dashboard`, `/api/reports`)
 
-### 8.1 Dashboard KPIs
-- **Method / Path**: `GET /api/reports/dashboard`
+### 8.1 Dashboard KPIs (M3 Implementation)
+- **Method / Path**: `GET /api/reports/kpis`
 - **Permissions**: All authenticated roles
 - **Query Parameters**:
   - `vehicleType` (optional)
