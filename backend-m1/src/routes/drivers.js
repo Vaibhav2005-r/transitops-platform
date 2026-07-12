@@ -65,4 +65,86 @@ router.get('/', async (req, res) => {
   }
 });
 
+// 3. Get Driver Details (GET /api/drivers/:id)
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const driver = await prisma.driver.findUnique({
+      where: { id: parseInt(id, 10) },
+      include: { trips: true } // As per API_CONTRACT
+    });
+
+    if (!driver) {
+      return res.status(404).json({ error: 'Driver not found' });
+    }
+
+    res.json(driver);
+  } catch (error) {
+    console.error('Error fetching driver:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// 4. Update Driver (PUT /api/drivers/:id)
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, licenseExpiryDate, safetyScore, status } = req.body;
+
+    const existingDriver = await prisma.driver.findUnique({
+      where: { id: parseInt(id, 10) }
+    });
+
+    if (!existingDriver) {
+      return res.status(404).json({ error: 'Driver not found' });
+    }
+
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (licenseExpiryDate !== undefined) {
+      const parsedDate = new Date(licenseExpiryDate);
+      if (isNaN(parsedDate.getTime())) {
+        return res.status(400).json({ error: 'Invalid licenseExpiryDate format.' });
+      }
+      updateData.licenseExpiryDate = parsedDate;
+    }
+    if (safetyScore !== undefined) updateData.safetyScore = parseInt(safetyScore, 10);
+    if (status !== undefined) updateData.status = status;
+
+    const driver = await prisma.driver.update({
+      where: { id: parseInt(id, 10) },
+      data: updateData
+    });
+
+    res.json(driver);
+  } catch (error) {
+    console.error('Error updating driver:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// 5. Delete Driver (DELETE /api/drivers/:id)
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const existingDriver = await prisma.driver.findUnique({
+      where: { id: parseInt(id, 10) }
+    });
+
+    if (!existingDriver) {
+      return res.status(404).json({ error: 'Driver not found' });
+    }
+
+    await prisma.driver.delete({
+      where: { id: parseInt(id, 10) }
+    });
+
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting driver:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;
