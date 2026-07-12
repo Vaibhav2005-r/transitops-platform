@@ -16,7 +16,7 @@ function Login() {
     setError("");
 
     try {
-      const res = await fetch("http://127.0.0.1:3000/api/auth/login", {
+      const res = await fetch("http://localhost:3000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: userEmail || email, password: userPassword || password })
@@ -25,14 +25,15 @@ function Login() {
 
       if (data.token) {
         localStorage.setItem("transitops_token", data.token);
-        localStorage.setItem("transitops_role", data.user.role);
-        localStorage.setItem("transitops_user", data.user.name);
+        // Backend returns flat: { token, role, name } — NOT { token, user: { role, name } }
+        localStorage.setItem("transitops_role", data.role);
+        localStorage.setItem("transitops_user", data.name);
         navigate("/");
       } else {
-        setError(data.error || "Login failed");
+        setError(data.error || "Login failed. Please check your credentials.");
       }
     } catch (err) {
-      setError("Failed to connect to server");
+      setError("Failed to connect to server. Make sure the backend is running on port 3000.");
     } finally {
       setLoading(false);
     }
@@ -40,9 +41,9 @@ function Login() {
 
   const loginAsManager = async () => {
     setLoading(true);
+    setError("");
     try {
-      // Ensure manager account exists first
-      await fetch("http://127.0.0.1:3000/api/auth/register", {
+      await fetch("http://localhost:3000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: "manager_test@transitops.com", password: "securepassword", name: "Test Manager", role: "Fleet Manager" })
@@ -51,16 +52,16 @@ function Login() {
       setPassword("securepassword");
       await handleLogin(null, "manager_test@transitops.com", "securepassword");
     } catch (err) {
-      setError("Failed to create/login dummy manager");
+      setError("Failed to connect to server. Make sure the backend is running on port 3000.");
       setLoading(false);
     }
   };
 
   const loginAsDriver = async () => {
     setLoading(true);
+    setError("");
     try {
-      // Ensure driver account exists first
-      await fetch("http://127.0.0.1:3000/api/auth/register", {
+      await fetch("http://localhost:3000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: "driver_test@transitops.com", password: "securepassword", name: "Test Driver", role: "Driver" })
@@ -69,7 +70,7 @@ function Login() {
       setPassword("securepassword");
       await handleLogin(null, "driver_test@transitops.com", "securepassword");
     } catch (err) {
-      setError("Failed to create/login dummy driver");
+      setError("Failed to connect to server. Make sure the backend is running on port 3000.");
       setLoading(false);
     }
   };
