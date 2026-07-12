@@ -315,8 +315,8 @@ function Dashboard() {
         </div>
         <div className="h-72 bg-slate-100 relative">
           <MapContainer 
-            center={[19.0760, 72.8777]} 
-            zoom={10} 
+            center={[21.1458, 79.0882]} 
+            zoom={4.5} 
             style={{ height: '100%', width: '100%', zIndex: 0 }}
           >
             <TileLayer
