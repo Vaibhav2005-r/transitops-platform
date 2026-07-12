@@ -48,10 +48,11 @@ function Drivers() {
     fetchDrivers();
   }, []);
 
-  const filteredDrivers = drivers.filter(d => 
-    d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    d.licenseNumber.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredDrivers = drivers.filter(d => {
+    const search = (searchTerm || "").toLowerCase();
+    return (d.name || "").toLowerCase().includes(search) ||
+           (d.licenseNumber || "").toLowerCase().includes(search);
+  });
 
   const getStatusColor = (status) => {
     switch (status) {

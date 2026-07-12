@@ -52,11 +52,12 @@ function Vehicles() {
     fetchVehicles();
   }, []);
 
-  const filteredVehicles = vehicles.filter(v => 
-    v.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    v.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    v.model.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredVehicles = vehicles.filter(v => {
+    const search = (searchTerm || "").toLowerCase();
+    return (v.registrationNumber || "").toLowerCase().includes(search) ||
+           (v.make || "").toLowerCase().includes(search) ||
+           (v.model || "").toLowerCase().includes(search);
+  });
 
   const getStatusColor = (status) => {
     switch (status) {

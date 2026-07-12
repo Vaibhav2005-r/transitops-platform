@@ -101,9 +101,10 @@ function Maintenance() {
     }
   };
 
-  const filteredLogs = logs.filter(log => 
-    log.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredLogs = logs.filter(log => {
+    const search = (searchTerm || "").toLowerCase();
+    return (log.description || "").toLowerCase().includes(search);
+  });
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="show" className="min-h-full">
