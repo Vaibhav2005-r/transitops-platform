@@ -37,41 +37,9 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 1. Authenticate to get a token (needed after Hour 4 RBAC hardening)
-    const authenticateAndFetch = async () => {
+    const fetchDashboardData = async () => {
       try {
-        let token = localStorage.getItem("transitops_token");
-        
-        // If no token, register/login a test Fleet Manager automatically
-        if (!token) {
-          const authRes = await fetch("http://localhost:3000/api/auth/register", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email: "manager_test@transitops.com",
-              password: "securepassword",
-              name: "Test Manager",
-              role: "Fleet Manager"
-            })
-          });
-          
-          const loginRes = await fetch("http://localhost:3000/api/auth/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email: "manager_test@transitops.com",
-              password: "securepassword"
-            })
-          });
-          
-          const loginData = await loginRes.json();
-          if (loginData.token) {
-            token = loginData.token;
-            localStorage.setItem("transitops_token", token);
-          }
-        }
-
-        // 2. Fetch the dashboard data using the token
+        const token = localStorage.getItem("transitops_token");
         const res = await fetch("http://localhost:3000/api/reports/dashboard", {
           headers: {
             "Authorization": `Bearer ${token}`
@@ -91,7 +59,7 @@ function Dashboard() {
       }
     };
 
-    authenticateAndFetch();
+    fetchDashboardData();
   }, []);
 
   if (loading) {
@@ -205,15 +173,13 @@ function Dashboard() {
               </PieChart>
             </ResponsiveContainer>
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-2">
-              <span className="text-[10px] font-semibold text-slate-600">Diesel</span>
+              <span className="text-[10px] font-semibold text-slate-600">Total</span>
               <span className="text-xl font-bold text-slate-800 leading-tight">
-                {data.fleetStatusByCategory.length > 0 
-                  ? Math.round((data.fleetStatusByCategory[0].value / (data.fleetStatusByCategory.reduce((a,b)=>a+b.value,0)||1)) * 100) 
-                  : 0}%
+                {data.fleetStatusByCategory.reduce((a, b) => a + b.value, 0)}
               </span>
             </div>
           </div>
-          <div className="flex justify-center gap-4 text-[10px] font-bold mt-2">
+          <div className="flex justify-center flex-wrap gap-x-4 gap-y-1 text-[10px] font-bold mt-2">
             {data.fleetStatusByCategory.map((cat, i) => (
               <div key={i} className="flex items-center gap-1.5 text-slate-600">
                 <span className="w-3 h-1 rounded" style={{ backgroundColor: cat.fill }}></span>

@@ -1,108 +1,135 @@
-import { FaPlus, FaSearch } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { MdDirectionsCar, MdSearch, MdAdd } from "react-icons/md";
+import { Link } from "react-router-dom";
 
-const vehicles = [
-  {
-    id: "VH-001",
-    number: "MH 02 AB 1234",
-    type: "Truck",
-    capacity: "12 Tons",
-    status: "Available",
-  },
-  {
-    id: "VH-002",
-    number: "MH 04 CD 5678",
-    type: "Mini Truck",
-    capacity: "5 Tons",
-    status: "On Trip",
-  },
-  {
-    id: "VH-003",
-    number: "MH 12 EF 9012",
-    type: "Truck",
-    capacity: "15 Tons",
-    status: "Maintenance",
-  },
-];
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+};
 
 function Vehicles() {
+  const [vehicles, setVehicles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        let token = localStorage.getItem("transitops_token");
+        if (!token) return; // Should be handled by layout/auth layer ideally
+
+        const res = await fetch("http://localhost:3000/api/vehicles", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        const data = await res.json();
+        setVehicles(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error("Failed to fetch vehicles:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchVehicles();
+  }, []);
+
+  const filteredVehicles = vehicles.filter(v => 
+    v.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    v.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    v.model.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Available': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+      case 'On Trip': return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'In Shop': return 'bg-rose-100 text-rose-700 border-rose-200';
+      case 'Retired': return 'bg-slate-100 text-slate-700 border-slate-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <motion.div variants={containerVariants} initial="hidden" animate="show" className="min-h-full">
+      <motion.div variants={itemVariants} className="flex justify-between items-end mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">
-            Vehicle Management
-          </h1>
-
-          <p className="text-slate-500 mt-1">
-            Manage your fleet vehicles and operational status.
-          </p>
+          <h1 className="text-[28px] font-bold text-slate-800 tracking-tight">Vehicle Directory</h1>
+          <p className="text-sm text-slate-600 mt-1 font-medium">Manage and monitor all vehicles in your fleet.</p>
         </div>
-
-        <button className="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-3 rounded-lg font-medium transition">
-          <FaPlus />
-          Add Vehicle
-        </button>
-      </div>
-
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
-        <div className="p-5 border-b border-slate-200">
-          <div className="relative max-w-md">
-            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-
-            <input
-              type="text"
-              placeholder="Search vehicles..."
-              className="w-full border border-slate-300 rounded-lg py-2.5 pl-10 pr-4 outline-none focus:ring-2 focus:ring-emerald-500"
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg" />
+            <input 
+              type="text" 
+              placeholder="Search vehicles..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 pr-4 py-2 bg-white/50 border border-white/60 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 w-64 placeholder:text-slate-500 backdrop-blur-md shadow-sm transition-all"
             />
           </div>
+          <Link to="/add-vehicle" className="bg-indigo-600/90 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md shadow-indigo-200 backdrop-blur-md transition-colors flex items-center gap-2">
+            <MdAdd className="text-lg" />
+            Add Vehicle
+          </Link>
         </div>
+      </motion.div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead className="bg-slate-50 text-slate-600 text-sm">
-              <tr>
-                <th className="px-6 py-4">Vehicle ID</th>
-                <th className="px-6 py-4">Registration Number</th>
-                <th className="px-6 py-4">Type</th>
-                <th className="px-6 py-4">Capacity</th>
-                <th className="px-6 py-4">Status</th>
+      {loading ? (
+        <div className="p-8 text-center text-slate-500 font-medium">Loading vehicles...</div>
+      ) : (
+        <motion.div variants={itemVariants} className="bg-white/60 backdrop-blur-xl border border-white/50 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-white/30 border-b border-white/40">
+                <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Vehicle</th>
+                <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Reg. Number</th>
+                <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Capacity (kg)</th>
+                <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Acquisition Cost</th>
+                <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
               </tr>
             </thead>
-
-            <tbody>
-              {vehicles.map((vehicle) => (
-                <tr
-                  key={vehicle.id}
-                  className="border-t border-slate-100 hover:bg-slate-50"
-                >
-                  <td className="px-6 py-4 font-medium text-slate-700">
-                    {vehicle.id}
+            <tbody className="divide-y divide-white/40">
+              {filteredVehicles.map(vehicle => (
+                <motion.tr whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }} key={vehicle.id} className="transition-colors cursor-pointer">
+                  <td className="py-3 px-6 flex items-center gap-3">
+                    <div className="bg-indigo-100 text-indigo-600 p-2 rounded-lg shadow-sm">
+                      <MdDirectionsCar className="text-xl" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-800 text-sm">{vehicle.make} {vehicle.model}</p>
+                      <p className="text-xs text-slate-500">ID: #{vehicle.id}</p>
+                    </div>
                   </td>
-
-                  <td className="px-6 py-4">{vehicle.number}</td>
-                  <td className="px-6 py-4">{vehicle.type}</td>
-                  <td className="px-6 py-4">{vehicle.capacity}</td>
-
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                        vehicle.status === "Available"
-                          ? "bg-emerald-100 text-emerald-700"
-                          : vehicle.status === "On Trip"
-                          ? "bg-blue-100 text-blue-700"
-                          : "bg-amber-100 text-amber-700"
-                      }`}
-                    >
+                  <td className="py-3 px-6 font-semibold text-slate-700 text-sm">{vehicle.registrationNumber}</td>
+                  <td className="py-3 px-6 font-medium text-slate-600 text-sm">{vehicle.capacityWeight}</td>
+                  <td className="py-3 px-6 font-medium text-slate-600 text-sm">${vehicle.acquisitionCost.toLocaleString()}</td>
+                  <td className="py-3 px-6">
+                    <span className={`px-2.5 py-1 text-[11px] font-bold rounded border shadow-sm ${getStatusColor(vehicle.status)}`}>
                       {vehicle.status}
                     </span>
                   </td>
-                </tr>
+                </motion.tr>
               ))}
+              {filteredVehicles.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="py-8 text-center text-slate-500 font-medium">No vehicles found.</td>
+                </tr>
+              )}
             </tbody>
           </table>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      )}
+    </motion.div>
   );
 }
 

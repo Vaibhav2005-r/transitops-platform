@@ -110,22 +110,53 @@ exports.getDashboardStats = async (req, res) => {
     const totalLiters = allFuelLogs._sum.liters || 0;
     const avgFuelEfficiency = totalLiters > 0 ? Number((totalDistance / totalLiters).toFixed(2)) : 0;
 
-    // Mock Fleet Status by Category (Since we lack Fuel Type in schema)
-    const fleetStatusByCategory = [
-      { name: 'Diesel', value: Math.floor(totalVehicles * 0.49), fill: '#0ea5e9' },
-      { name: 'Petrol', value: Math.floor(totalVehicles * 0.27), fill: '#0284c7' },
-      { name: 'Electric', value: Math.ceil(totalVehicles * 0.24), fill: '#38bdf8' }
-    ];
+    // Real Fleet Status by Category (Grouping by Status)
+    const statusGroups = await prisma.vehicle.groupBy({
+      by: ['status'],
+      _count: { id: true }
+    });
+    
+    const colorMap = {
+      'Available': '#10b981', // Emerald
+      'On Trip': '#3b82f6',   // Blue
+      'In Shop': '#f43f5e',   // Rose
+      'Retired': '#64748b'    // Slate
+    };
 
-    // Mock Fuel vs Maintenance for last 6 days
-    const fuelVsMaintenance = Array.from({ length: 6 }).map((_, i) => {
+    const fleetStatusByCategory = statusGroups.map(group => ({
+      name: group.status,
+      value: group._count.id,
+      fill: colorMap[group.status] || '#cbd5e1'
+    }));
+
+    // Real Fuel vs Maintenance for last 7 days
+    const last7Days = Array.from({ length: 7 }).map((_, i) => {
       const d = new Date();
-      d.setDate(d.getDate() - (5 - i));
+      d.setDate(d.getDate() - (6 - i));
       return {
         date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        Maintenance: Math.floor(Math.random() * 60000) + 30000, // Mock 30k-90k
-        Fuel: Math.floor(Math.random() * 50000) + 20000         // Mock 20k-70k
+        Maintenance: 0,
+        Fuel: 0
       };
+    });
+
+    // Aggregate Maintenance
+    allMaintenanceLogs.forEach(log => {
+      const dateStr = log.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const day = last7Days.find(d => d.date === dateStr);
+      if (day) day.Maintenance += log.cost;
+    });
+
+    // Aggregate Fuel
+    const recentFuelLogs = await prisma.fuelLog.findMany({
+      where: { date: { gte: new Date(new Date().setDate(new Date().getDate() - 7)) } },
+      select: { date: true, cost: true }
+    });
+    
+    recentFuelLogs.forEach(log => {
+      const dateStr = log.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const day = last7Days.find(d => d.date === dateStr);
+      if (day) day.Fuel += log.cost;
     });
 
     res.status(200).json({
@@ -138,7 +169,7 @@ exports.getDashboardStats = async (req, res) => {
         avgFuelEfficiency,
         topDrivers,
         fleetStatusByCategory,
-        fuelVsMaintenance
+        fuelVsMaintenance: last7Days
       }
     });
   } catch (error) {
