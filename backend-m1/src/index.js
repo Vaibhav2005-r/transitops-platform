@@ -20,6 +20,10 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date() });
 });
 
+// Mount Routes
+const m3Routes = require('./routes/m3.routes');
+app.use('/api', m3Routes);
+
 // Start server
 app.listen(PORT, () => {
   console.log(`TransitOps server running on port ${PORT}`);
