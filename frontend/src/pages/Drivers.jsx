@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { MdPerson, MdSearch, MdAdd, MdStar } from "react-icons/md";
+import { MdSearch, MdAdd, MdStar } from "react-icons/md";
 
 const containerVariants = {
   hidden: { opacity: 0 },

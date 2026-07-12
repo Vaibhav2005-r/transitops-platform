@@ -230,7 +230,7 @@ function Dashboard() {
             <span className="text-[10px] font-semibold text-indigo-600 cursor-pointer hover:underline">View More</span>
           </div>
           <div className="space-y-3.5">
-            {data.topDrivers.map((driver, index) => (
+            {data.topDrivers.map((driver) => (
               <motion.div whileHover={{ x: 4 }} key={driver.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-white/40 transition-colors cursor-pointer">
                 <div className="flex items-center gap-3">
                   <img 
