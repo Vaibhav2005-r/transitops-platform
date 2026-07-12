@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../prisma');
+const { authenticate, authorize } = require('../middleware/auth');
 
 // 1. Create Trip (Draft) (POST /api/trips)
-router.post('/', async (req, res) => {
+router.post('/', authenticate, authorize('Fleet Manager', 'Dispatcher'), async (req, res) => {
   try {
     const { vehicleId, driverId, source, destination, cargoWeight, distance } = req.body;
 
@@ -61,7 +62,7 @@ router.post('/', async (req, res) => {
 });
 
 // 2. Transition Trip: Update Status (PUT /api/trips/:id/status)
-router.put('/:id/status', async (req, res) => {
+router.put('/:id/status', authenticate, authorize('Fleet Manager', 'Dispatcher'), async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;

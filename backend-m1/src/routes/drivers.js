@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../prisma');
+const { authenticate, authorize } = require('../middleware/auth');
 
 // 1. Create Driver (POST /api/drivers)
-router.post('/', async (req, res) => {
+router.post('/', authenticate, authorize('Fleet Manager', 'Safety Officer'), async (req, res) => {
   try {
     const { name, licenseNumber, licenseExpiryDate, safetyScore } = req.body;
 
@@ -44,7 +45,7 @@ router.post('/', async (req, res) => {
 });
 
 // 2. List Drivers (GET /api/drivers)
-router.get('/', async (req, res) => {
+router.get('/', authenticate, async (req, res) => {
   try {
     const { status } = req.query;
 
@@ -66,7 +67,7 @@ router.get('/', async (req, res) => {
 });
 
 // 3. Get Driver Details (GET /api/drivers/:id)
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticate, async (req, res) => {
   try {
     const { id } = req.params;
     const driver = await prisma.driver.findUnique({
@@ -86,7 +87,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // 4. Update Driver (PUT /api/drivers/:id)
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticate, authorize('Fleet Manager', 'Safety Officer'), async (req, res) => {
   try {
     const { id } = req.params;
     const { name, licenseExpiryDate, safetyScore, status } = req.body;
@@ -124,7 +125,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // 5. Delete Driver (DELETE /api/drivers/:id)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticate, authorize('Fleet Manager', 'Safety Officer'), async (req, res) => {
   try {
     const { id } = req.params;
 

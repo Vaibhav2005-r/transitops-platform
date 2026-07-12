@@ -1,0 +1,109 @@
+### 
+### TransitOps Example Workflow Test (Hour 4)
+### Target: http://localhost:3000
+###
+
+@baseUrl = http://localhost:3000/api
+
+### 1. Register a Fleet Manager
+# @name registerFleetManager
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "manager_test@transitops.com",
+  "password": "securepassword",
+  "name": "Test Manager",
+  "role": "Fleet Manager"
+}
+
+### 2. Login to get JWT Token
+# @name loginFleetManager
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "manager_test@transitops.com",
+  "password": "securepassword"
+}
+
+### Capture Token
+@token = {{loginFleetManager.response.body.token}}
+
+### 3. Register Vehicle (Van-05)
+# @name registerVehicle
+POST {{baseUrl}}/vehicles
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "registrationNumber": "VAN-05-TEST",
+  "make": "Ford",
+  "model": "Transit",
+  "capacityWeight": 500,
+  "acquisitionCost": 35000,
+  "status": "Available"
+}
+
+### Capture Vehicle ID
+@vehicleId = {{registerVehicle.response.body.id}}
+
+### 4. Register Driver (Alex)
+# @name registerDriver
+POST {{baseUrl}}/drivers
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Alex Test",
+  "licenseNumber": "ALEX-LIC-1234",
+  "licenseExpiryDate": "2028-12-31T00:00:00.000Z",
+  "safetyScore": 100
+}
+
+### Capture Driver ID
+@driverId = {{registerDriver.response.body.id}}
+
+### 5. Create Trip (450kg Cargo)
+# @name createTrip
+POST {{baseUrl}}/trips
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "vehicleId": {{vehicleId}},
+  "driverId": {{driverId}},
+  "source": "Warehouse A",
+  "destination": "Delivery Hub B",
+  "cargoWeight": 450,
+  "distance": 12.5
+}
+
+### Capture Trip ID
+@tripId = {{createTrip.response.body.id}}
+
+### 6. Dispatch Trip (Validates Business Rules & Changes Status)
+# @name dispatchTrip
+PUT {{baseUrl}}/trips/{{tripId}}/status
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "status": "Dispatched"
+}
+
+### 7. Test M2 Business Rule Violation (Overweight Cargo)
+# @name testOverweightTrip
+POST {{baseUrl}}/trips
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "vehicleId": {{vehicleId}},
+  "driverId": {{driverId}},
+  "source": "Warehouse A",
+  "destination": "Delivery Hub B",
+  "cargoWeight": 600,
+  "distance": 12.5
+}
+# Expected Response: 400 Bad Request ("Validation failed: Cargo weight exceeds vehicle capacity of 500 kg.")
