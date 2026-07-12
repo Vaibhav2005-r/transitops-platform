@@ -26,8 +26,10 @@ const driversRouter = require('./routes/drivers');
 const reportsRouter = require('./routes/reports.routes');
 const tripsRouter = require('./routes/trips');
 const aiRouter = require('./routes/ai.routes');
+const dashboardRoutes = require('./routes/dashboard');
 
 app.use('/api', m3Routes);
+app.use('/api', dashboardRoutes);
 app.use('/api/drivers', driversRouter);
 app.use('/api/reports', reportsRouter);
 app.use('/api/trips', tripsRouter);
