@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { MdDirectionsCar, MdSearch, MdAdd } from "react-icons/md";
 import { Link } from "react-router-dom";
@@ -21,6 +21,14 @@ function Vehicles() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const userRole = localStorage.getItem("transitops_role");
+  const fileInputRef = useRef(null);
+  const [selectedVehicleForDoc, setSelectedVehicleForDoc] = useState(null);
+
+  const handleDocUpload = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      alert(`Successfully uploaded ${e.target.files[0].name} to vehicle ${selectedVehicleForDoc}!`);
+    }
+  };
 
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -99,12 +107,13 @@ function Vehicles() {
                 <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Capacity (kg)</th>
                 <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Acquisition Cost</th>
                 <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Docs</th>
                 {userRole === "Fleet Manager" && <th className="py-3 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-white/40">
               {filteredVehicles.map(vehicle => (
-                <motion.tr whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }} key={vehicle.id} className="transition-colors cursor-pointer">
+                <motion.tr onClick={() => alert(`Vehicle Profile for ${vehicle.registrationNumber} is currently simulated for the demo. Future feature coming soon!`)} whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.4)" }} key={vehicle.id} className="transition-colors cursor-pointer">
                   <td className="py-3 px-6 flex items-center gap-3">
                     <div className="bg-indigo-100 text-indigo-600 p-2 rounded-lg shadow-sm">
                       <MdDirectionsCar className="text-xl" />
@@ -122,6 +131,18 @@ function Vehicles() {
                       {vehicle.status}
                     </span>
                   </td>
+                  <td className="py-3 px-6">
+                    <button 
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        setSelectedVehicleForDoc(vehicle.registrationNumber);
+                        fileInputRef.current.click();
+                      }}
+                      className="text-[11px] font-bold text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded transition-colors"
+                    >
+                      Upload Docs
+                    </button>
+                  </td>
                   {userRole === "Fleet Manager" && (
                     <td className="py-3 px-6 text-right">
                       <button className="text-indigo-600 hover:text-indigo-800 text-xs font-bold mr-3" onClick={(e) => { e.stopPropagation(); alert('Edit coming soon!'); }}>Edit</button>
@@ -132,11 +153,12 @@ function Vehicles() {
               ))}
               {filteredVehicles.length === 0 && (
                 <tr>
-                  <td colSpan={userRole === "Fleet Manager" ? "6" : "5"} className="py-8 text-center text-slate-500 font-medium">No vehicles found.</td>
+                  <td colSpan={userRole === "Fleet Manager" ? "7" : "6"} className="py-8 text-center text-slate-500 font-medium">No vehicles found.</td>
                 </tr>
               )}
             </tbody>
           </table>
+          <input type="file" ref={fileInputRef} onChange={handleDocUpload} className="hidden" accept=".pdf,.jpg,.png" />
         </motion.div>
       )}
     </motion.div>

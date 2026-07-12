@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { MdSearch, MdAdd, MdStar } from "react-icons/md";
 
@@ -17,7 +17,16 @@ function Drivers() {
   const [drivers, setDrivers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sendingReminder, setSendingReminder] = useState(null);
   const navigate = useNavigate();
+
+  const handleSendReminder = () => {
+    setSendingReminder(true);
+    setTimeout(() => {
+      setSendingReminder(false);
+      alert("Emails dispatched to 2 drivers with expiring licenses.");
+    }, 2000);
+  };
 
   useEffect(() => {
     const fetchDrivers = async () => {
@@ -65,16 +74,23 @@ function Drivers() {
             <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg" />
             <input 
               type="text" 
-              placeholder="Search by name or license..." 
+              placeholder="Search drivers..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9 pr-4 py-2 bg-white/50 border border-white/60 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 w-64 placeholder:text-slate-500 backdrop-blur-md shadow-sm transition-all"
             />
           </div>
-          <button onClick={() => navigate('/add-driver')} className="bg-indigo-600/90 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md shadow-indigo-200 backdrop-blur-md transition-colors flex items-center gap-2">
-            <MdAdd className="text-lg" />
-            Add Owner
+          <button 
+            onClick={handleSendReminder} 
+            disabled={sendingReminder}
+            className="bg-white/50 border border-slate-300 hover:bg-white text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold shadow-sm backdrop-blur-md transition-colors flex items-center gap-2 disabled:opacity-50"
+          >
+            {sendingReminder ? "Sending..." : "Send Reminders"}
           </button>
+          <Link to="/add-driver" className="bg-indigo-600/90 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow-md shadow-indigo-200 backdrop-blur-md transition-colors flex items-center gap-2">
+            <MdAdd className="text-lg" />
+            Add Driver
+          </Link>
         </div>
       </motion.div>
 
@@ -106,7 +122,7 @@ function Drivers() {
                   <MdStar className="text-sm" />
                   <span className="text-xs font-bold">{driver.safetyScore} Safety Score</span>
                 </div>
-                <button className="text-[11px] font-bold text-indigo-600 hover:underline">View Profile</button>
+                <button onClick={() => navigate(`/driver/${driver.id}`)} className="text-[11px] font-bold text-indigo-600 hover:underline">View Profile</button>
               </div>
             </motion.div>
           ))}

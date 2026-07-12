@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   MdDirectionsCar,
@@ -38,19 +39,23 @@ function Dashboard() {
   const [error, setError] = useState(null);
   const userName = localStorage.getItem("transitops_user") || "there";
   const greetingName = userName.split(" ")[0];
+  const [timeFilter, setTimeFilter] = useState("7");
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       setLoading(true);
       setError(null);
       try {
+        setLoading(true);
         const token = localStorage.getItem("transitops_token");
         if (!token) {
           window.location.href = '/login';
           return;
         }
-        const res = await fetch("http://localhost:3000/api/reports/dashboard", {
-          headers: { "Authorization": `Bearer ${token}` }
+        const res = await fetch(`http://localhost:3000/api/reports/dashboard?filter=${timeFilter}`, {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
         });
 
         if (res.status === 401) {
@@ -72,7 +77,7 @@ function Dashboard() {
       }
     };
     fetchDashboardData();
-  }, []);
+  }, [timeFilter]);
 
   if (loading) {
     return (
@@ -152,10 +157,14 @@ function Dashboard() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <select className="border border-white/50 rounded-md py-1 px-3 text-xs font-semibold text-slate-600 bg-white/40 backdrop-blur-sm shadow-sm hover:bg-white/60 transition-colors outline-none focus:ring-2 focus:ring-indigo-500/50">
-            <option>Last 7 Days</option>
-            <option>Last 30 Days</option>
-            <option>This Month</option>
+          <select 
+            value={timeFilter}
+            onChange={(e) => setTimeFilter(e.target.value)}
+            className="border border-white/50 rounded-md py-1 px-3 text-xs font-semibold text-slate-600 bg-white/40 backdrop-blur-sm shadow-sm hover:bg-white/60 transition-colors outline-none focus:ring-2 focus:ring-indigo-500/50"
+          >
+            <option value="7">Last 7 Days</option>
+            <option value="30">Last 30 Days</option>
+            <option value="month">This Month</option>
           </select>
         </div>
       </motion.div>
@@ -273,7 +282,7 @@ function Dashboard() {
                   />
                   <div>
                     <p className="text-[13px] font-bold text-slate-800 leading-tight">{driver.name}</p>
-                    <a href="#" className="text-[10px] font-semibold text-indigo-500 hover:underline">Visit Profile</a>
+                    <Link to={`/driver/${driver.id}`} className="text-[10px] font-semibold text-indigo-500 hover:underline">Visit Profile</Link>
                   </div>
                 </div>
                 <span className="font-extrabold text-slate-800 text-sm bg-white/60 px-2 py-1 rounded shadow-sm">{driver.safetyScore}</span>

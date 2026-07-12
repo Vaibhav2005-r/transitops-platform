@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import CopilotChat from "../CopilotChat";
 
 function MainLayout() {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ function MainLayout() {
 
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-indigo-100 via-sky-50 to-teal-100 font-sans overflow-hidden">
+    <div className="flex h-screen bg-gradient-to-br from-indigo-100 via-sky-50 to-teal-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:text-white font-sans overflow-hidden transition-colors duration-300">
       <Sidebar />
 
       <div className="flex-1 flex flex-col h-full overflow-hidden">
@@ -26,6 +27,8 @@ function MainLayout() {
           <Outlet />
         </main>
       </div>
+
+      <CopilotChat />
     </div>
   );
 }

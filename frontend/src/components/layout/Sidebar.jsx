@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { MdLogout } from "react-icons/md";
 import {
   FaChartBar,
   FaCog,
@@ -12,7 +13,8 @@ import {
   MdDirectionsCar, 
   MdPeople,
   MdBuild,
-  MdAddBox
+  MdAddBox,
+  MdAttachMoney
 } from "react-icons/md";
 
 const menuItems = [
@@ -20,8 +22,9 @@ const menuItems = [
   { name: "Add Vehicle", icon: <MdAddBox />, path: "/add-vehicle" },
   { name: "Vehicle Directory", icon: <MdDirectionsCar />, path: "/vehicles" },
   { name: "Owners Directory", icon: <MdPeople />, path: "/drivers" },
-  { name: "Fleet Analytics", icon: <FaChartBar />, path: "/reports" },
   { name: "Maintenance Logs", icon: <MdBuild />, path: "/maintenance" },
+  { name: "Fuel & Expenses", icon: <MdAttachMoney />, path: "/expenses" },
+  { name: "Fleet Analytics", icon: <FaChartBar />, path: "/reports" },
 ];
 
 const containerVariants = {
@@ -108,10 +111,10 @@ function Sidebar() {
       {/* Bottom Menu */}
       <div className="px-3 pb-4">
         <nav className="space-y-1 mb-4">
-          <motion.button onClick={() => alert("Settings configuration coming soon in V2!")} whileHover={{ scale: 1.02 }} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-white/50 transition-colors">
+          <NavLink to="/settings" className={({ isActive }) => `w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${isActive ? "bg-white/80 text-indigo-600 shadow-sm border border-white/60" : "text-slate-600 hover:bg-white/50"}`}>
             <FaCog className="text-indigo-500" />
             <span>Settings</span>
-          </motion.button>
+          </NavLink>
           <motion.button onClick={() => alert("Help center is currently under maintenance.")} whileHover={{ scale: 1.02 }} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-white/50 transition-colors">
             <FaQuestionCircle className="text-indigo-500" />
             <span>Help and Support</span>
@@ -127,7 +130,7 @@ function Sidebar() {
         
         {/* User Profile + Logout */}
         <div className="pt-4 border-t border-white/50">
-          <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/30 transition-colors">
+          <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/30 transition-colors mb-2">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-sm font-bold shadow-sm flex-shrink-0">
               {userInitials}
             </div>
@@ -135,16 +138,12 @@ function Sidebar() {
               <p className="text-sm font-semibold text-slate-800 truncate">{userName}</p>
               <p className="text-xs text-slate-500 truncate">{userRole}</p>
             </div>
-            <motion.button
-              whileHover={{ scale: 1.15 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={handleLogout}
-              title="Logout"
-              className="p-2 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-all flex-shrink-0"
-            >
-              <FaSignOutAlt className="text-base" />
-            </motion.button>
           </div>
+          
+          <motion.button onClick={handleLogout} whileHover={{ scale: 1.02 }} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-bold text-rose-600 hover:bg-rose-50 hover:border-rose-100 border border-transparent transition-colors">
+            <MdLogout className="text-lg" />
+            <span>Sign Out</span>
+          </motion.button>
         </div>
       </div>
     </aside>
