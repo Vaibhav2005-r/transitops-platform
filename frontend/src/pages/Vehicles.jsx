@@ -125,7 +125,7 @@ function Vehicles() {
                   </td>
                   <td className="py-3 px-6 font-semibold text-slate-700 text-sm">{vehicle.registrationNumber}</td>
                   <td className="py-3 px-6 font-medium text-slate-600 text-sm">{vehicle.capacityWeight}</td>
-                  <td className="py-3 px-6 font-medium text-slate-600 text-sm">${vehicle.acquisitionCost.toLocaleString()}</td>
+                  <td className="py-3 px-6 font-medium text-slate-600 text-sm">₹{vehicle.acquisitionCost.toLocaleString()}</td>
                   <td className="py-3 px-6">
                     <span className={`px-2.5 py-1 text-[11px] font-bold rounded border shadow-sm ${getStatusColor(vehicle.status)}`}>
                       {vehicle.status}

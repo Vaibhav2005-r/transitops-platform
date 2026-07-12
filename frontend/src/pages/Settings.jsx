@@ -20,7 +20,7 @@ function Settings() {
     notifications: true,
     emailAlerts: true,
     darkMode: false,
-    currency: "USD",
+    currency: "INR",
     distanceUnit: "km"
   });
 
@@ -80,7 +80,7 @@ function Settings() {
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-600 uppercase">Currency</label>
                 <select name="currency" value={settings.currency} onChange={handleChange} className="w-full px-4 py-2 bg-white/50 border border-white/60 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
-                  <option value="USD">USD ($)</option>
+                  <option value="INR">INR (₹)</option>
                   <option value="EUR">EUR (€)</option>
                   <option value="GBP">GBP (£)</option>
                   <option value="INR">INR (₹)</option>

@@ -46,7 +46,7 @@ function Login() {
       await fetch("http://localhost:3000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: "manager_test@transitops.com", password: "securepassword", name: "Test Manager", role: "Fleet Manager" })
+        body: JSON.stringify({ email: "manager_test@transitops.com", password: "securepassword", name: "Rajesh Kumar", role: "Fleet Manager" })
       });
       setEmail("manager_test@transitops.com");
       setPassword("securepassword");
@@ -64,7 +64,7 @@ function Login() {
       await fetch("http://localhost:3000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: "driver_test@transitops.com", password: "securepassword", name: "Test Driver", role: "Driver" })
+        body: JSON.stringify({ email: "driver_test@transitops.com", password: "securepassword", name: "Amit Singh", role: "Driver" })
       });
       setEmail("driver_test@transitops.com");
       setPassword("securepassword");

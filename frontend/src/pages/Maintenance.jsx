@@ -161,7 +161,7 @@ function Maintenance() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-600 uppercase">Cost ($)</label>
+                  <label className="text-xs font-bold text-slate-600 uppercase">Cost (₹)</label>
                   <input 
                     required type="number" step="0.01" name="cost" value={formData.cost} onChange={handleChange} placeholder="e.g. 150.00"
                     className="w-full px-4 py-2 bg-white/50 border border-white/60 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
@@ -211,7 +211,7 @@ function Maintenance() {
                   <td className="py-3 px-6 font-semibold text-slate-700 text-sm">{new Date(log.date).toLocaleDateString()}</td>
                   <td className="py-3 px-6 font-medium text-indigo-600 text-sm">Vehicle #{log.vehicleId}</td>
                   <td className="py-3 px-6 font-medium text-slate-800 text-sm">{log.description}</td>
-                  <td className="py-3 px-6 font-extrabold text-rose-600 text-sm">${log.cost.toLocaleString()}</td>
+                  <td className="py-3 px-6 font-extrabold text-rose-600 text-sm">₹{log.cost.toLocaleString()}</td>
                 </motion.tr>
               ))}
               {filteredLogs.length === 0 && (

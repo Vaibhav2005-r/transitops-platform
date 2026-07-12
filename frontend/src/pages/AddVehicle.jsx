@@ -156,7 +156,7 @@ function AddVehicle() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-600 uppercase">Acquisition Cost ($)</label>
+            <label className="text-xs font-bold text-slate-600 uppercase">Acquisition Cost (₹)</label>
             <input 
               required
               name="acquisitionCost"

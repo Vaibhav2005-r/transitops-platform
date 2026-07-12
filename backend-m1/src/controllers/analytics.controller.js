@@ -114,13 +114,13 @@ exports.getDashboardStats = async (req, res) => {
         take: 5,
         select: { id: true, name: true, safetyScore: true }
       }),
-      prisma.fuelLog.aggregate({ _sum: { liters: true } }),
+      prisma.fuelLog.aggregate({ where: { date: { gte: startDate } }, _sum: { liters: true } }),
       prisma.maintenanceLog.findMany({
         where: { date: { gte: startDate } },
         select: { date: true, cost: true }
       }),
-      prisma.trip.aggregate({ _sum: { distance: true } }),
-      prisma.trip.count()
+      prisma.trip.aggregate({ where: { createdAt: { gte: startDate } }, _sum: { distance: true } }),
+      prisma.trip.count({ where: { createdAt: { gte: startDate } } })
     ]);
 
     const totalDistance = allTrips._sum.distance || 0;
@@ -155,7 +155,7 @@ exports.getDashboardStats = async (req, res) => {
          d.setDate(d.getDate() - (daysCount - 1 - i));
       }
       return {
-        date: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        date: d.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }),
         Maintenance: 0,
         Fuel: 0
       };
@@ -163,7 +163,7 @@ exports.getDashboardStats = async (req, res) => {
 
     // Aggregate Maintenance
     allMaintenanceLogs.forEach(log => {
-      const dateStr = log.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const dateStr = log.date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
       const day = dateRange.find(d => d.date === dateStr);
       if (day) day.Maintenance += log.cost;
     });
@@ -175,7 +175,7 @@ exports.getDashboardStats = async (req, res) => {
     });
     
     recentFuelLogs.forEach(log => {
-      const dateStr = log.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const dateStr = log.date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
       const day = dateRange.find(d => d.date === dateStr);
       if (day) day.Fuel += log.cost;
     });

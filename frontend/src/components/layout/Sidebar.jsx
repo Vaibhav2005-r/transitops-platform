@@ -1,4 +1,7 @@
+import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import HelpModal from "./ui/HelpModal";
+import NotificationsModal from "./ui/NotificationsModal";
 import { motion } from "framer-motion";
 import { MdLogout } from "react-icons/md";
 import {
@@ -46,6 +49,9 @@ function Sidebar() {
   const userRole = localStorage.getItem("transitops_role") || "Staff";
   const userInitials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
 
+  const [showHelp, setShowHelp] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+
   const handleLogout = () => {
     localStorage.removeItem("transitops_token");
     localStorage.removeItem("transitops_role");
@@ -54,7 +60,8 @@ function Sidebar() {
   };
 
   return (
-    <aside className="w-[260px] min-h-screen bg-white/60 backdrop-blur-xl border-r border-white/40 flex flex-col shadow-xl z-20 relative">
+    <>
+      <aside className="w-[260px] min-h-screen bg-white/60 backdrop-blur-xl border-r border-white/40 flex flex-col shadow-xl z-20 relative">
       {/* Logo Area */}
       <div className="p-5 flex items-center gap-2">
         <div className="text-indigo-600">
@@ -115,16 +122,16 @@ function Sidebar() {
             <FaCog className="text-indigo-500" />
             <span>Settings</span>
           </NavLink>
-          <motion.button onClick={() => alert("Help center is currently under maintenance.")} whileHover={{ scale: 1.02 }} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-white/50 transition-colors">
+          <motion.button onClick={() => setShowHelp(true)} whileHover={{ scale: 1.02 }} className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-white/50 transition-colors">
             <FaQuestionCircle className="text-indigo-500" />
             <span>Help and Support</span>
           </motion.button>
-          <motion.button onClick={() => alert("You have 8 unread notifications!")} whileHover={{ scale: 1.02 }} className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-white/50 transition-colors">
+          <motion.button onClick={() => setShowNotifications(true)} whileHover={{ scale: 1.02 }} className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg text-sm font-medium text-slate-600 hover:bg-white/50 transition-colors">
             <div className="flex items-center gap-3">
               <FaBell className="text-indigo-500" />
               <span>Notifications</span>
             </div>
-            <span className="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">8</span>
+            <span className="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">4</span>
           </motion.button>
         </nav>
         
@@ -147,6 +154,10 @@ function Sidebar() {
         </div>
       </div>
     </aside>
+      
+      <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
+      <NotificationsModal isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
+    </>
   );
 }
 

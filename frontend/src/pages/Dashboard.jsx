@@ -246,7 +246,7 @@ function Dashboard() {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data.fuelVsMaintenance} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#475569', fontWeight: 600 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#475569', fontWeight: 600 }} tickFormatter={(val) => `$${val/1000}k`} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#475569', fontWeight: 600 }} tickFormatter={(val) => `₹${val/1000}k`} />
                 <Tooltip cursor={{ fill: 'rgba(255,255,255,0.4)' }} contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(8px)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.5)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }} />
                 <Bar dataKey="Maintenance" stackId="a" fill="#14b8a6" barSize={24} />
                 <Bar dataKey="Fuel" stackId="a" fill="#818cf8" barSize={24} radius={[4, 4, 0, 0]} />
