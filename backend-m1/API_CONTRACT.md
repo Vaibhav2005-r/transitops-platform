@@ -45,16 +45,31 @@
 - Response: `MaintenanceLog`
 - *Side Effect: Updates Vehicle status to 'In Shop'*
 
+**PUT /api/maintenance/:id/close**
+- Request: `{}`
+- Response: `MaintenanceLog`
+- *Side Effect: Restores Vehicle status to 'Available'*
+
 **POST /api/fuel**
 - Request: `{ vehicleId, liters, cost }`
 - Response: `FuelLog`
+
+**GET /api/expenses**
+- Response: `Expense[]`
 
 **POST /api/expenses**
 - Request: `{ vehicleId, description, cost, type }` (type: Tolls, Misc)
 - Response: `Expense`
 
-## Dashboard & Reports (M4 / M1)
-**GET /api/reports/dashboard**
+**PUT /api/expenses/:id**
+- Request: `{ description, cost, type }`
+- Response: `Expense`
+
+**DELETE /api/expenses/:id**
+- Response: `{ success: true }`
+
+## Dashboard & Reports (M4 / M1 / M3)
+**GET /api/reports/dashboard** (M1/M4)
 - Query params: `?vehicleType=&status=&region=`
 - Response:
 ```json
@@ -66,5 +81,15 @@
   "pendingTrips": 1,
   "driversOnDuty": 4,
   "fleetUtilization": 85.5
+}
+```
+
+**GET /api/reports/vehicle/:id/analytics** (M3)
+- Response:
+```json
+{
+  "fuelEfficiency": 12.5, // Distance / Fuel
+  "operationalCost": 1500, // Maintenance + Fuel + Expenses
+  "roi": 15.2 // (Revenue - Operational Cost) / Acquisition Cost
 }
 ```
