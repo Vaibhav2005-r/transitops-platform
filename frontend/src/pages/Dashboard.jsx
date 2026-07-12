@@ -35,39 +35,72 @@ const itemVariants = {
 function Dashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const userName = localStorage.getItem("transitops_user") || "there";
+  const greetingName = userName.split(" ")[0];
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const token = localStorage.getItem("transitops_token");
+        if (!token) {
+          window.location.href = '/login';
+          return;
+        }
         const res = await fetch("http://localhost:3000/api/reports/dashboard", {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
+          headers: { "Authorization": `Bearer ${token}` }
         });
+
+        if (res.status === 401) {
+          localStorage.removeItem("transitops_token");
+          window.location.href = '/login';
+          return;
+        }
         
         const json = await res.json();
         if (json.success) {
           setData(json.data);
         } else {
-          console.error("Dashboard error:", json.error);
+          setError(json.error || "Server returned an error.");
         }
       } catch (err) {
-        console.error("Failed to fetch dashboard data:", err);
+        setError("Could not reach the backend. Please ensure it is running on port 3000.");
       } finally {
         setLoading(false);
       }
     };
-
     fetchDashboardData();
   }, []);
 
   if (loading) {
-    return <div className="p-8 flex items-center justify-center text-slate-500">Loading dashboard...</div>;
+    return (
+      <div className="p-8 flex flex-col items-center justify-center gap-3 text-slate-500 min-h-full">
+        <svg className="animate-spin h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <p className="font-semibold">Loading dashboard...</p>
+      </div>
+    );
   }
 
-  if (!data) {
-    return <div className="p-8 text-red-500">Failed to load dashboard data. Is the backend running?</div>;
+  if (error || !data) {
+    return (
+      <div className="min-h-full flex items-center justify-center p-8">
+        <div className="max-w-md w-full bg-white/60 backdrop-blur-xl border border-white/50 rounded-2xl shadow-xl shadow-slate-200/50 p-8 text-center">
+          <div className="bg-rose-100 text-rose-500 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-rose-100">
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+          </div>
+          <h2 className="text-xl font-bold text-slate-800 mb-2">Dashboard Unavailable</h2>
+          <p className="text-slate-500 text-sm mb-6">{error || "Failed to load dashboard data."}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-xl font-semibold text-sm shadow-md shadow-indigo-200 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const kpis = [
@@ -113,7 +146,7 @@ function Dashboard() {
       {/* HEADER */}
       <motion.div variants={itemVariants} className="flex justify-between items-start mb-6">
         <div>
-          <h1 className="text-[28px] font-bold text-slate-800 tracking-tight">Good Morning, Ravi!</h1>
+          <h1 className="text-[28px] font-bold text-slate-800 tracking-tight">Good morning, {greetingName}!</h1>
           <p className="text-sm text-slate-600 mt-1 font-medium">
             Here's the health overview of your fleet at a glance.
           </p>

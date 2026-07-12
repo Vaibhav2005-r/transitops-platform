@@ -1,10 +1,11 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   FaChartBar,
   FaCog,
   FaQuestionCircle,
   FaBell,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { 
   MdDashboard, 
@@ -37,6 +38,18 @@ const itemVariants = {
 };
 
 function Sidebar() {
+  const navigate = useNavigate();
+  const userName = localStorage.getItem("transitops_user") || "User";
+  const userRole = localStorage.getItem("transitops_role") || "Staff";
+  const userInitials = userName.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+
+  const handleLogout = () => {
+    localStorage.removeItem("transitops_token");
+    localStorage.removeItem("transitops_role");
+    localStorage.removeItem("transitops_user");
+    navigate("/login");
+  };
+
   return (
     <aside className="w-[260px] min-h-screen bg-white/60 backdrop-blur-xl border-r border-white/40 flex flex-col shadow-xl z-20 relative">
       {/* Logo Area */}
@@ -112,12 +125,25 @@ function Sidebar() {
           </motion.button>
         </nav>
         
-        {/* User Profile */}
-        <div className="px-4 pt-4 border-t border-white/50 flex items-center gap-3 cursor-pointer hover:bg-white/30 rounded-lg p-2 transition-colors">
-          <img src="https://ui-avatars.com/api/?name=Ravinthranath+A&background=random" alt="Avatar" className="w-8 h-8 rounded-full shadow-sm" />
-          <div className="overflow-hidden">
-            <p className="text-sm font-semibold text-slate-800 truncate">Ravinthranath A</p>
-            <p className="text-xs text-slate-500 truncate">ravinthranath@gmail.com</p>
+        {/* User Profile + Logout */}
+        <div className="pt-4 border-t border-white/50">
+          <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/30 transition-colors">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-sm font-bold shadow-sm flex-shrink-0">
+              {userInitials}
+            </div>
+            <div className="overflow-hidden flex-1 min-w-0">
+              <p className="text-sm font-semibold text-slate-800 truncate">{userName}</p>
+              <p className="text-xs text-slate-500 truncate">{userRole}</p>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.15 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleLogout}
+              title="Logout"
+              className="p-2 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-all flex-shrink-0"
+            >
+              <FaSignOutAlt className="text-base" />
+            </motion.button>
           </div>
         </div>
       </div>
