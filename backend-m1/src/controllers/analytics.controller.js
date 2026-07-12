@@ -99,6 +99,7 @@ exports.getDashboardStats = async (req, res) => {
       activeVehicles,
       underMaintenance,
       totalDrivers,
+      liveVehicles,
       topDrivers,
       allFuelLogs,
       allMaintenanceLogs,
@@ -109,6 +110,10 @@ exports.getDashboardStats = async (req, res) => {
       prisma.vehicle.count({ where: { status: { in: ['Available', 'On Trip'] } } }),
       prisma.vehicle.count({ where: { status: 'In Shop' } }),
       prisma.driver.count(),
+      prisma.vehicle.findMany({
+        where: { status: { not: 'Retired' } },
+        select: { id: true, registrationNumber: true, status: true, make: true, model: true }
+      }),
       prisma.driver.findMany({
         orderBy: { safetyScore: 'desc' },
         take: 5,
@@ -180,6 +185,20 @@ exports.getDashboardStats = async (req, res) => {
       if (day) day.Fuel += log.cost;
     });
 
+    // Assign pseudo-random coordinates around Mumbai based on vehicle ID
+    const baseLat = 19.0760;
+    const baseLng = 72.8777;
+    const vehiclesWithLocation = liveVehicles.map(v => {
+      // Deterministic pseudo-random offset
+      const offsetLat = ((v.id * 13) % 100) / 1000 - 0.05;
+      const offsetLng = ((v.id * 17) % 100) / 1000 - 0.05;
+      return {
+        ...v,
+        lat: baseLat + offsetLat,
+        lng: baseLng + offsetLng
+      };
+    });
+
     res.status(200).json({
       success: true,
       data: {
@@ -191,7 +210,8 @@ exports.getDashboardStats = async (req, res) => {
         topDrivers,
         fleetStatusByCategory,
         fuelVsMaintenance: dateRange,
-        totalTrips
+        totalTrips,
+        liveVehicles: vehiclesWithLocation
       }
     });
   } catch (error) {

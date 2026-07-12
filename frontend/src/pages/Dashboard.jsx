@@ -323,18 +323,18 @@ function Dashboard() {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
               url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
             />
-            <Marker position={[19.0760, 72.8777]} icon={carIcon}>
-              <Popup className="font-semibold text-sm">Vehicle MH-01-AB-1234<br/>Status: Active</Popup>
-            </Marker>
-            <Marker position={[19.1136, 72.8697]} icon={carIcon}>
-              <Popup className="font-semibold text-sm">Vehicle MH-02-CD-5678<br/>Status: Active</Popup>
-            </Marker>
-            <Marker position={[19.0522, 72.9005]} icon={carIcon}>
-              <Popup className="font-semibold text-sm">Vehicle MH-03-EF-9101<br/>Status: Loading</Popup>
-            </Marker>
-            <Marker position={[19.2183, 72.9781]} icon={carIcon}>
-              <Popup className="font-semibold text-sm">Vehicle MH-04-GH-1121<br/>Status: Idle</Popup>
-            </Marker>
+            {data.liveVehicles && data.liveVehicles.map(vehicle => (
+              <Marker key={vehicle.id} position={[vehicle.lat, vehicle.lng]} icon={carIcon}>
+                <Popup className="font-semibold text-sm">
+                  {vehicle.make} {vehicle.model} ({vehicle.registrationNumber})<br/>
+                  <span className={
+                    vehicle.status === 'Available' ? 'text-teal-600' :
+                    vehicle.status === 'On Trip' ? 'text-blue-600' :
+                    'text-rose-600'
+                  }>Status: {vehicle.status}</span>
+                </Popup>
+              </Marker>
+            ))}
           </MapContainer>
         </div>
       </motion.div>
