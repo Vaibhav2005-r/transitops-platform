@@ -19,6 +19,18 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+import { renderToStaticMarkup } from 'react-dom/server';
+
+const carIconHtml = renderToStaticMarkup(<MdDirectionsCar style={{ fontSize: '16px', color: '#1e293b' }} />);
+const carIcon = L.divIcon({
+  html: `<div style="background-color: #facc15; padding: 4px; border-radius: 4px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); display: flex; align-items: center; justify-content: center; width: 24px; height: 24px;">${carIconHtml}</div>`,
+  className: '',
+  iconSize: [24, 24],
+  iconAnchor: [12, 12]
+});
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -301,22 +313,29 @@ function Dashboard() {
           <h3 className="font-bold text-slate-800 text-sm drop-shadow-sm">Live Map</h3>
           <span className="text-[10px] font-semibold text-indigo-600 cursor-pointer hover:underline">Detail View</span>
         </div>
-        <div className="h-56 bg-slate-100 relative">
-           <img 
-            src="https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/pass/GoogleMapTA.jpg" 
-            alt="Map placeholder" 
-            className="w-full h-full object-cover opacity-80"
-          />
-          {/* Mock Yellow Taxi Icons */}
-          <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 2 }} className="absolute top-[20%] left-[30%] bg-yellow-400 p-1.5 rounded-sm shadow-md rotate-12">
-            <MdDirectionsCar className="text-slate-800 text-xs" />
-          </motion.div>
-          <motion.div animate={{ y: [0, -4, 0] }} transition={{ repeat: Infinity, duration: 2.5, delay: 0.5 }} className="absolute top-[60%] left-[65%] bg-yellow-400 p-1.5 rounded-sm shadow-md -rotate-12">
-            <MdDirectionsCar className="text-slate-800 text-xs" />
-          </motion.div>
-          <motion.div animate={{ y: [0, -6, 0] }} transition={{ repeat: Infinity, duration: 1.8, delay: 1 }} className="absolute bottom-[20%] right-[30%] bg-yellow-400 p-1.5 rounded-sm shadow-md rotate-45">
-            <MdDirectionsCar className="text-slate-800 text-xs" />
-          </motion.div>
+        <div className="h-72 bg-slate-100 relative">
+          <MapContainer 
+            center={[19.0760, 72.8777]} 
+            zoom={10} 
+            style={{ height: '100%', width: '100%', zIndex: 0 }}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+            />
+            <Marker position={[19.0760, 72.8777]} icon={carIcon}>
+              <Popup className="font-semibold text-sm">Vehicle MH-01-AB-1234<br/>Status: Active</Popup>
+            </Marker>
+            <Marker position={[19.1136, 72.8697]} icon={carIcon}>
+              <Popup className="font-semibold text-sm">Vehicle MH-02-CD-5678<br/>Status: Active</Popup>
+            </Marker>
+            <Marker position={[19.0522, 72.9005]} icon={carIcon}>
+              <Popup className="font-semibold text-sm">Vehicle MH-03-EF-9101<br/>Status: Loading</Popup>
+            </Marker>
+            <Marker position={[19.2183, 72.9781]} icon={carIcon}>
+              <Popup className="font-semibold text-sm">Vehicle MH-04-GH-1121<br/>Status: Idle</Popup>
+            </Marker>
+          </MapContainer>
         </div>
       </motion.div>
     </motion.div>
