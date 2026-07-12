@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  roleId       Int
+  role         Role     @relation(fields: [roleId], references: [id])
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  users User[]
+}
+
+model Vehicle {
+  id                 Int              @id @default(autoincrement())
+  registrationNumber String           @unique
+  make               String
+  model              String
+  capacityWeight     Float
+  status             String           @default("Available")
+  trips              Trip[]
+  maintenanceLogs    MaintenanceLog[]
+  fuelLogs           FuelLog[]
+  expenses           Expense[]
+}
+
+model Driver {
+  id                Int      @id @default(autoincrement())
+  name              String
+  licenseNumber     String   @unique
+  licenseExpiryDate DateTime
+  safetyScore       Int      @default(100)
+  status            String   @default("Available")
+  trips             Trip[]
+}
+
+model Trip {
+  id           Int      @id @default(autoincrement())
+  vehicleId    Int
+  driverId     Int
+  source       String
+  destination  String
+  cargoWeight  Float
+  distance     Float
+  status       String   @default("Draft")
+  vehicle      Vehicle  @relation(fields: [vehicleId], references: [id])
+  driver       Driver   @relation(fields: [driverId], references: [id])
+  createdAt    DateTime @default(now())
+}
+
+model MaintenanceLog {
+  id          Int      @id @default(autoincrement())
+  vehicleId   Int
+  description String
+  cost        Float
+  date        DateTime @default(now())
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+}
+
+model FuelLog {
+  id        Int      @id @default(autoincrement())
+  vehicleId Int
+  liters    Float
+  cost      Float
+  date      DateTime @default(now())
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+}
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  vehicleId   Int
+  description String
+  cost        Float
+  type        String
+  date        DateTime @default(now())
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+}
