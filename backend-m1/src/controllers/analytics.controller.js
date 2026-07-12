@@ -87,7 +87,8 @@ exports.getDashboardStats = async (req, res) => {
       topDrivers,
       allFuelLogs,
       allMaintenanceLogs,
-      allTrips
+      allTrips,
+      totalTrips
     ] = await Promise.all([
       prisma.vehicle.count(),
       prisma.vehicle.count({ where: { status: { in: ['Available', 'On Trip'] } } }),
@@ -103,7 +104,8 @@ exports.getDashboardStats = async (req, res) => {
         where: { date: { gte: new Date(new Date().setDate(new Date().getDate() - 7)) } },
         select: { date: true, cost: true }
       }),
-      prisma.trip.aggregate({ _sum: { distance: true } })
+      prisma.trip.aggregate({ _sum: { distance: true } }),
+      prisma.trip.count()
     ]);
 
     const totalDistance = allTrips._sum.distance || 0;
@@ -169,7 +171,8 @@ exports.getDashboardStats = async (req, res) => {
         avgFuelEfficiency,
         topDrivers,
         fleetStatusByCategory,
-        fuelVsMaintenance: last7Days
+        fuelVsMaintenance: last7Days,
+        totalTrips
       }
     });
   } catch (error) {

@@ -96,6 +96,11 @@ function Dashboard() {
       value: data.totalDrivers,
       icon: <MdPerson className="text-blue-500 text-xl" />,
     },
+    {
+      title: "Total Trips",
+      value: (data.totalTrips || 0).toLocaleString(),
+      icon: <MdCheckCircle className="text-indigo-500 text-xl" />,
+    },
   ];
 
   return (
@@ -123,7 +128,7 @@ function Dashboard() {
       </motion.div>
 
       {/* KPI ROW */}
-      <div className="grid grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
         {kpis.map((kpi, index) => (
           <motion.div 
             variants={itemVariants}
