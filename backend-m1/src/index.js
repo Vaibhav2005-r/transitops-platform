@@ -8,6 +8,13 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Routes
+const authRoutes = require('./routes/auth');
+const vehicleRoutes = require('./routes/vehicles');
+
+app.use('/api/auth', authRoutes);
+app.use('/api/vehicles', vehicleRoutes);
+
 // Health route
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date() });
