@@ -20,6 +20,37 @@ import {
   MdAttachMoney
 } from "react-icons/md";
 
+const notificationsList = [
+  {
+    id: 1,
+    type: "warning",
+    title: "Maintenance Overdue",
+    message: "Vehicle VAN-4125 is past its scheduled maintenance by 3 days.",
+    time: "2 hours ago"
+  },
+  {
+    id: 2,
+    type: "info",
+    title: "New Driver Added",
+    message: "Amit Singh has been successfully registered to the platform.",
+    time: "5 hours ago"
+  },
+  {
+    id: 3,
+    type: "success",
+    title: "Trip Completed",
+    message: "Trip #142 from Warehouse A to Retailer B was completed.",
+    time: "1 day ago"
+  },
+  {
+    id: 4,
+    type: "warning",
+    title: "Fuel Efficiency Drop",
+    message: "Fleet average fuel efficiency dropped by 2% this week.",
+    time: "2 days ago"
+  }
+];
+
 const menuItems = [
   { name: "My Dashboard", icon: <MdDashboard />, path: "/" },
   { name: "Add Vehicle", icon: <MdAddBox />, path: "/add-vehicle" },
@@ -51,6 +82,7 @@ function Sidebar() {
 
   const [showHelp, setShowHelp] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState(notificationsList);
 
   const handleLogout = () => {
     localStorage.removeItem("transitops_token");
@@ -131,7 +163,11 @@ function Sidebar() {
               <FaBell className="text-indigo-500" />
               <span>Notifications</span>
             </div>
-            <span className="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">4</span>
+            {notifications.length > 0 && (
+              <span className="bg-rose-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+                {notifications.length}
+              </span>
+            )}
           </motion.button>
         </nav>
         
@@ -156,7 +192,12 @@ function Sidebar() {
     </aside>
       
       <HelpModal isOpen={showHelp} onClose={() => setShowHelp(false)} />
-      <NotificationsModal isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
+      <NotificationsModal 
+        isOpen={showNotifications} 
+        onClose={() => setShowNotifications(false)} 
+        notifications={notifications}
+        onClear={() => setNotifications([])}
+      />
     </>
   );
 }

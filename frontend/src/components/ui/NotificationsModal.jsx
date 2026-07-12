@@ -2,40 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MdClose, MdInfo, MdWarning, MdCheckCircle, MdNotificationsOff } from "react-icons/md";
 
-const notificationsList = [
-  {
-    id: 1,
-    type: "warning",
-    title: "Maintenance Overdue",
-    message: "Vehicle VAN-4125 is past its scheduled maintenance by 3 days.",
-    time: "2 hours ago"
-  },
-  {
-    id: 2,
-    type: "info",
-    title: "New Driver Added",
-    message: "Amit Singh has been successfully registered to the platform.",
-    time: "5 hours ago"
-  },
-  {
-    id: 3,
-    type: "success",
-    title: "Trip Completed",
-    message: "Trip #142 from Warehouse A to Retailer B was completed.",
-    time: "1 day ago"
-  },
-  {
-    id: 4,
-    type: "warning",
-    title: "Fuel Efficiency Drop",
-    message: "Fleet average fuel efficiency dropped by 2% this week.",
-    time: "2 days ago"
-  }
-];
-
-function NotificationsModal({ isOpen, onClose }) {
-  const [notifications, setNotifications] = useState(notificationsList);
-  
+function NotificationsModal({ isOpen, onClose, notifications, onClear }) {
   if (!isOpen) return null;
 
   const getIcon = (type) => {
@@ -100,7 +67,7 @@ function NotificationsModal({ isOpen, onClose }) {
           {notifications.length > 0 && (
             <div className="p-3 border-t border-slate-200/50 bg-slate-50/50">
               <button 
-                onClick={() => setNotifications([])}
+                onClick={onClear}
                 className="w-full py-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-colors"
               >
                 Mark all as read
