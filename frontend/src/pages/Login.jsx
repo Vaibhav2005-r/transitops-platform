@@ -10,16 +10,16 @@ function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e, userEmail, userPassword) => {
     e?.preventDefault();
     setLoading(true);
     setError("");
 
     try {
-      const res = await fetch("http://localhost:3000/api/auth/login", {
+      const res = await fetch("http://127.0.0.1:3000/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email: userEmail || email, password: userPassword || password })
       });
       const data = await res.json();
 
@@ -39,27 +39,39 @@ function Login() {
   };
 
   const loginAsManager = async () => {
-    // Ensure manager account exists first
-    await fetch("http://localhost:3000/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: "manager_test@transitops.com", password: "securepassword", name: "Test Manager", role: "Fleet Manager" })
-    });
-    setEmail("manager_test@transitops.com");
-    setPassword("securepassword");
-    setTimeout(() => document.getElementById("loginForm").requestSubmit(), 100);
+    setLoading(true);
+    try {
+      // Ensure manager account exists first
+      await fetch("http://127.0.0.1:3000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: "manager_test@transitops.com", password: "securepassword", name: "Test Manager", role: "Fleet Manager" })
+      });
+      setEmail("manager_test@transitops.com");
+      setPassword("securepassword");
+      await handleLogin(null, "manager_test@transitops.com", "securepassword");
+    } catch (err) {
+      setError("Failed to create/login dummy manager");
+      setLoading(false);
+    }
   };
 
   const loginAsDriver = async () => {
-    // Ensure driver account exists first
-    await fetch("http://localhost:3000/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: "driver_test@transitops.com", password: "securepassword", name: "Test Driver", role: "Driver" })
-    });
-    setEmail("driver_test@transitops.com");
-    setPassword("securepassword");
-    setTimeout(() => document.getElementById("loginForm").requestSubmit(), 100);
+    setLoading(true);
+    try {
+      // Ensure driver account exists first
+      await fetch("http://127.0.0.1:3000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: "driver_test@transitops.com", password: "securepassword", name: "Test Driver", role: "Driver" })
+      });
+      setEmail("driver_test@transitops.com");
+      setPassword("securepassword");
+      await handleLogin(null, "driver_test@transitops.com", "securepassword");
+    } catch (err) {
+      setError("Failed to create/login dummy driver");
+      setLoading(false);
+    }
   };
 
   return (
