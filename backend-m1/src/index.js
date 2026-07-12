@@ -25,11 +25,13 @@ const m3Routes = require('./routes/m3.routes');
 const driversRouter = require('./routes/drivers');
 const reportsRouter = require('./routes/reports.routes');
 const tripsRouter = require('./routes/trips');
+const aiRouter = require('./routes/ai.routes');
 
 app.use('/api', m3Routes);
 app.use('/api/drivers', driversRouter);
 app.use('/api/reports', reportsRouter);
 app.use('/api/trips', tripsRouter);
+app.use('/api/ai', aiRouter);
 
 // Start server
 app.listen(PORT, () => {
