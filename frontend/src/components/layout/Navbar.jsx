@@ -1,6 +1,16 @@
 import { MdChevronLeft, MdDirectionsCar, MdSearch, MdMic } from "react-icons/md";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Navbar() {
+  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter' && query.trim()) {
+      navigate(`/vehicles?q=${encodeURIComponent(query)}`);
+    }
+  };
   return (
     <header className="h-[72px] bg-white/40 backdrop-blur-xl border-b border-white/40 flex justify-between items-center px-4 shrink-0 shadow-sm z-10 relative">
       <div className="flex items-center gap-4">
@@ -22,7 +32,10 @@ function Navbar() {
           </div>
           <input 
             type="text" 
-            placeholder="Search vehicles or drivers..." 
+            placeholder="Search vehicles (press enter)..." 
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleSearch}
             className="pl-9 pr-4 py-1.5 bg-white/50 border border-white/60 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500/50 w-64 placeholder:text-slate-500 backdrop-blur-md shadow-sm transition-all"
           />
         </div>

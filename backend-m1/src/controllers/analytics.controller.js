@@ -199,12 +199,12 @@ exports.getDashboardStats = async (req, res) => {
     ];
     
     const vehiclesWithLocation = liveVehicles.map((v, index) => {
-      // Pick a region deterministically based on vehicle ID
+      // Pick a region based on vehicle ID so it doesn't jump between regions on refresh, but is still spread out
       const region = mmrRegions[v.id % mmrRegions.length];
       
-      // Tiny deterministic offset to avoid overlap (roughly within 1-2 km of the region center)
-      const offsetLat = ((v.id * 13) % 20 - 10) / 1000;
-      const offsetLng = ((v.id * 17) % 20 - 10) / 1000;
+      // Random offset within roughly ~5km (0.05 degrees) to spread them out naturally
+      const offsetLat = (Math.random() - 0.5) * 0.1;
+      const offsetLng = (Math.random() - 0.5) * 0.1;
       
       return {
         ...v,

@@ -19,10 +19,16 @@ const itemVariants = {
 function Vehicles() {
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialQuery = searchParams.get("q") || "";
+  const [searchTerm, setSearchTerm] = useState(initialQuery);
   const userRole = localStorage.getItem("transitops_role");
   const fileInputRef = useRef(null);
   const [selectedVehicleForDoc, setSelectedVehicleForDoc] = useState(null);
+
+  useEffect(() => {
+    setSearchTerm(searchParams.get("q") || "");
+  }, [searchParams]);
 
   const handleDocUpload = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -83,7 +89,10 @@ function Vehicles() {
               type="text" 
               placeholder="Search vehicles..." 
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setSearchParams(e.target.value ? { q: e.target.value } : {}, { replace: true });
+              }}
               className="pl-9 pr-4 py-2 bg-white/50 border border-white/60 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 w-64 placeholder:text-slate-500 backdrop-blur-md shadow-sm transition-all"
             />
           </div>
