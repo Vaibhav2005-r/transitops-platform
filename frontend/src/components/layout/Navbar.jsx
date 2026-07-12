@@ -1,18 +1,34 @@
+import { MdChevronLeft, MdDirectionsCar, MdSearch, MdMic } from "react-icons/md";
+
 function Navbar() {
   return (
-    <header className="h-16 bg-white border-b flex justify-between items-center px-8">
-      <h2 className="text-2xl font-semibold">
-        Dashboard
-      </h2>
-
-      <div className="flex items-center gap-6">
-        <button className="text-2xl">
-          🔔
+    <header className="h-[72px] bg-white border-b border-slate-200 flex justify-between items-center px-4 shrink-0">
+      <div className="flex items-center gap-4">
+        <button className="bg-teal-500 text-white rounded p-1 hover:bg-teal-600">
+          <MdChevronLeft className="text-xl" />
         </button>
-
-        <div className="font-medium">
-          Admin
+        <div className="flex items-center gap-2 text-slate-800 text-lg">
+          <MdDirectionsCar className="text-teal-500 text-xl" />
+          <span className="font-semibold">MotoSync</span>
+          <span className="text-slate-400 font-light mx-1">›</span>
+          <span className="text-slate-600">Dashboard</span>
         </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <MdSearch className="text-slate-400 text-lg" />
+          </div>
+          <input 
+            type="text" 
+            placeholder="Search vehicles or drivers..." 
+            className="pl-9 pr-4 py-1.5 border border-slate-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-teal-500 focus:border-teal-500 w-64 placeholder:text-slate-400"
+          />
+        </div>
+        <button className="bg-teal-500 text-white rounded-md p-1.5 hover:bg-teal-600">
+          <MdMic className="text-lg" />
+        </button>
       </div>
     </header>
   );
