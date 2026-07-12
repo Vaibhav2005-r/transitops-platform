@@ -25,6 +25,9 @@ function Vehicles() {
   const userRole = localStorage.getItem("transitops_role");
   const fileInputRef = useRef(null);
   const [selectedVehicleForDoc, setSelectedVehicleForDoc] = useState(null);
+  
+  const [editingVehicle, setEditingVehicle] = useState(null);
+  const [editFormData, setEditFormData] = useState({});
 
   useEffect(() => {
     setSearchTerm(searchParams.get("q") || "");
@@ -57,6 +60,63 @@ function Vehicles() {
     };
     fetchVehicles();
   }, []);
+
+  const handleDelete = async (e, vehicle) => {
+    e.stopPropagation();
+    if (window.confirm(`Are you sure you want to delete ${vehicle.registrationNumber}? All related logs will be deleted.`)) {
+      try {
+        const token = localStorage.getItem("transitops_token");
+        const res = await fetch(`http://localhost:3000/api/vehicles/${vehicle.id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          setVehicles(vehicles.filter(v => v.id !== vehicle.id));
+        } else {
+          alert('Failed to delete vehicle.');
+        }
+      } catch (err) {
+        console.error('Delete error', err);
+      }
+    }
+  };
+
+  const handleEditClick = (e, vehicle) => {
+    e.stopPropagation();
+    setEditingVehicle(vehicle);
+    setEditFormData({
+      registrationNumber: vehicle.registrationNumber,
+      make: vehicle.make,
+      model: vehicle.model,
+      capacityWeight: vehicle.capacityWeight,
+      acquisitionCost: vehicle.acquisitionCost,
+      status: vehicle.status
+    });
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("transitops_token");
+      const res = await fetch(`http://localhost:3000/api/vehicles/${editingVehicle.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(editFormData)
+      });
+      if (res.ok) {
+        const updatedVehicle = await res.json();
+        setVehicles(vehicles.map(v => v.id === updatedVehicle.id ? updatedVehicle : v));
+        setEditingVehicle(null);
+      } else {
+        alert('Failed to update vehicle');
+      }
+    } catch (err) {
+      console.error('Update error', err);
+    }
+  };
 
   const filteredVehicles = vehicles.filter(v => {
     const search = (searchTerm || "").toLowerCase();
@@ -161,8 +221,8 @@ function Vehicles() {
                   </td>
                   {userRole === "Fleet Manager" && (
                     <td className="py-3 px-6 text-right">
-                      <button className="text-indigo-500 hover:text-indigo-700 text-xs font-bold mr-3 transition-colors" onClick={(e) => { e.stopPropagation(); alert('Edit coming soon!'); }}>Edit</button>
-                      <button className="text-rose-500 hover:text-rose-700 text-xs font-bold transition-colors" onClick={(e) => { e.stopPropagation(); alert('Delete coming soon!'); }}>Delete</button>
+                      <button className="text-indigo-500 hover:text-indigo-700 text-xs font-bold mr-3 transition-colors" onClick={(e) => handleEditClick(e, vehicle)}>Edit</button>
+                      <button className="text-rose-500 hover:text-rose-700 text-xs font-bold transition-colors" onClick={(e) => handleDelete(e, vehicle)}>Delete</button>
                     </td>
                   )}
                 </motion.tr>
@@ -177,6 +237,60 @@ function Vehicles() {
           <input type="file" ref={fileInputRef} onChange={handleDocUpload} className="hidden" accept=".pdf,.jpg,.png" />
         </motion.div>
       )}
+
+      <AnimatePresence>
+        {editingVehicle && (
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 w-full max-w-lg"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-4">Edit Vehicle</h2>
+              <form onSubmit={handleEditSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Make</label>
+                    <input type="text" value={editFormData.make} onChange={(e) => setEditFormData({...editFormData, make: e.target.value})} className="w-full px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Model</label>
+                    <input type="text" value={editFormData.model} onChange={(e) => setEditFormData({...editFormData, model: e.target.value})} className="w-full px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Reg Number</label>
+                    <input type="text" value={editFormData.registrationNumber} onChange={(e) => setEditFormData({...editFormData, registrationNumber: e.target.value})} className="w-full px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Status</label>
+                    <select value={editFormData.status} onChange={(e) => setEditFormData({...editFormData, status: e.target.value})} className="w-full px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+                      <option value="Available">Available</option>
+                      <option value="On Trip">On Trip</option>
+                      <option value="In Shop">In Shop</option>
+                      <option value="Retired">Retired</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Capacity (kg)</label>
+                    <input type="number" value={editFormData.capacityWeight} onChange={(e) => setEditFormData({...editFormData, capacityWeight: e.target.value})} className="w-full px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Acquisition Cost</label>
+                    <input type="number" value={editFormData.acquisitionCost} onChange={(e) => setEditFormData({...editFormData, acquisitionCost: e.target.value})} className="w-full px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50" required />
+                  </div>
+                </div>
+                <div className="flex justify-end gap-3 mt-6 pt-4 border-t dark:border-slate-700">
+                  <button type="button" onClick={() => setEditingVehicle(null)} className="px-4 py-2 text-slate-600 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors">Cancel</button>
+                  <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium shadow-lg shadow-indigo-500/25 transition-colors">Save Changes</button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
     </motion.div>
   );
 }
